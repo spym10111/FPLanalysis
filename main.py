@@ -1,10 +1,15 @@
 from fplteam import FPLteam
 
 
-print("\n---------------------------Welcome to the FPL team creation program!---------------------------")
+print("\n---------------------------------Welcome to FPL Analysis!---------------------------------")
 
 
-def menu():
+def menu() -> None:
+    """
+    Starting menu of the program.
+
+    :return: None
+    """
     choice = 0
     while choice not in [1, 2, 3, 4, 5]:
         print("\n\nPlease enter a number from the list below: ")
@@ -61,12 +66,17 @@ def menu():
                 continue
         elif choice == 5:
             # Exits the program
-            print("\nThank you for using the program.")
+            print("\nThank you for using FPL Analysis.")
             break
         choice = 0
 
 
-def pick_menu_number():
+def pick_menu_number() -> int:
+    """
+    Gets the menu choice of the user.
+
+    :return: int
+    """
     choice = ""
     while choice not in [1, 2, 3, 4, 5]:
         try:
