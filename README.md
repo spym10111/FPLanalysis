@@ -10,7 +10,15 @@ FPL Analysis is a project under development whose purpose is to assist managers 
 ## Installation
 
 The program runs on Python 3.10.
-1. 
+1. Install from source on Linux
+```bash
+$ git clone https://github.com/spym10111/FPLanalysis.git
+$ cd fplanalysis
+$ python3 -m venv venv
+$ source venv/bin/activate
+$ pip install -r requirements.txt
+$ python3 main.py
+```
 2. Install from source on Windows
 ```bash
 git clone https://github.com/spym10111/FPLanalysis.git
@@ -20,6 +28,7 @@ python -m venv venv
 pip install -r requirements.txt
 python main.py
 ```
+3. 
 
 ## Usage
 
