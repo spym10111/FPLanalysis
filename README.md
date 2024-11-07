@@ -5,7 +5,7 @@ FPL Analysis is a project under development whose purpose is to assist managers 
 ## Table of Contents
 - [Installation](#installation)
 - [Usage](#usage)
-- [Suggestions](#suggestions)
+  - [Suggestions](#suggestions)
 
 ## Installation
 
@@ -28,7 +28,7 @@ python -m venv venv
 pip install -r requirements.txt
 python main.py
 ```
-3. 
+3. Download the .zip file directly from GitHub.
 
 ## Usage
 
