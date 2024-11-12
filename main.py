@@ -17,7 +17,8 @@ def menu() -> None:
         print("\n2. Create new team: The program creates the best possible team for you.")
         print("\n3. Enter new team: You manually enter your team.")
         print("\n4. Open saved team: Open a previously saved team.")
-        print("\n5. Exit")
+        print("\n5. Rank players.")
+        print("\n6. Exit")
 
         choice = pick_menu_number()
         print("")
@@ -65,6 +66,14 @@ def menu() -> None:
                 choice = 0
                 continue
         elif choice == 5:
+            fplteam = FPLteam()
+            try:
+                # Comparing players' captaincy points
+                fplteam.compare_players()
+            except ValueError:
+                choice = 0
+                continue
+        elif choice == 6:
             # Exits the program
             print("\nThank you for using FPL Analysis.")
             break
@@ -78,10 +87,10 @@ def pick_menu_number() -> int:
     :return: int
     """
     choice = ""
-    while choice not in [1, 2, 3, 4, 5]:
+    while choice not in [1, 2, 3, 4, 5, 6]:
         try:
             choice = int(input("\n\nEnter number: "))
-            if choice not in [1, 2, 3, 4, 5]:
+            if choice not in [1, 2, 3, 4, 5, 6]:
                 print("\nInvalid number.")
         except ValueError:
             print("\nInvalid number.")

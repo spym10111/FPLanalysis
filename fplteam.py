@@ -106,7 +106,8 @@ class FPLteam:
 
         :return: None
         """
-        print(f"\nTeam budget: {round(self.starters_budget, 2)}")
+        print(f"\nIn the bank: {self.bank_budget}")
+        print(f"Squad transfer value: {round(self.starters_budget, 2)}")
         print(f"Squad: {self.team}")
         print(f"Potential captains: 1) {self.team[self.captain_points.index(max(self.captain_points))]}"
               f"\t2) {self.team[self.captain_points.index(sorted(self.captain_points)[-2])]}")
@@ -182,6 +183,46 @@ class FPLteam:
                       "still being played you might keep getting this notice even if your e-mail "
                       "and password are correct.")
 
+    def compare_players(self):
+        """
+        Used for comparing players based on their captaincy points (cost value is not included).
+
+        :return: None
+        """
+        print("\nThe program will create a list of players that are going to be ranked in the end based on "
+              "\ncaptaincy points (meaning that their cost value is not included)."
+              "\nPlease type 'stop' when you are done entering player names.\n")
+        comparing_players_dict = {}
+        add_player = ""
+        invalid = False
+        while add_player != "stop":
+            add_player = input("Give a player's name: ")
+            if add_player == "stop":
+                break
+            for player in self.fpl.player_data["name"]:
+                if unidecode(player.lower()) == unidecode(add_player.lower()):
+                    comparing_players_dict.update({player: self.fpl.player_stat(player, "captain_points")})
+                    invalid = False
+                    break
+                else:
+                    invalid = True
+            if invalid:
+                print("\nInvalid player name.")
+        points_list = list(comparing_players_dict.values())
+        points_list.sort(reverse=True)
+        sorted_comparing_players_dict = {}
+        for number in points_list:
+            for name, points in comparing_players_dict.items():
+                if number == points:
+                    sorted_comparing_players_dict.update({name: points})
+        if len(comparing_players_dict) == 0:
+            print("")
+        else:
+            print("\n   Name\t\t\tCaptaincy Points")
+            for player in sorted_comparing_players_dict.keys():
+                print(f"{points_list.index(sorted_comparing_players_dict[player]) + 1}. {player:21}"
+                      f"{round(sorted_comparing_players_dict[player], 2)}")
+
     def change_players(self):
         """
         Function for replacing players if excluded.
@@ -223,7 +264,6 @@ class FPLteam:
                         self.change_players_more_loops(
                             used_players, changing_players, team_player, max_budget, temp_teams, temp_teams_change
                         )
-
         for team_player in changing_players:
             self.add_player(team_player)
         for player in final_changing_players:
@@ -561,9 +601,9 @@ class FPLteam:
             if len(possible_transfers) == 0:
                 print("-")
             else:
-                print("Name\t\tBetter Value Possibility")
+                print("Name\t\t\tBetter Value Possibility")
                 for name in sorted_possible_transfers:
-                    print(f"{name:<16}{sorted_possible_transfers[name]} %")
+                    print(f"{name:<24}{sorted_possible_transfers[name]} %")
 
         extended_suggestion = ""
         while extended_suggestion.lower() != "yes" and extended_suggestion.lower() != "no":
@@ -1063,13 +1103,9 @@ class FPLteam:
         # just calls the result from there without running again
         # (a bit of cheating someone might say... *sips tea sardonically*)
         for player in saved_team[username]["Team"]:
-            self.fpl.fplapi.main_df.loc[
-                self.fpl.fplapi.main_df.index[
-                    self.fpl.fplapi.main_df["name"] == player
-                    ], ["cost"]
-            ] = saved_team[username]["Starters_prices"][
-                saved_team[username]["Team"].index(player)
-            ]
+            self.fpl.fplapi.main_df.loc[self.fpl.fplapi.main_df.index[
+                self.fpl.fplapi.main_df["name"] == player], ["cost"]] = saved_team[username]["Starters_prices"][
+                saved_team[username]["Team"].index(player)]
         for player in saved_team[username]["Team"]:
             self.add_player(player)
 
@@ -1420,10 +1456,10 @@ def enter_budget(budget_choice: str) -> float:
     :return: A float of the player's price entered.
     """
     player_price = ""
-    type_error = True
+    type_correct = True
     cancel_value = False
     if budget_choice.lower() == "yes":
-        while type_error:
+        while type_correct:
             try:
                 player_price_str = input("Add player's selling price: ")
                 if player_price_str.lower() == "cancel":
@@ -1432,7 +1468,7 @@ def enter_budget(budget_choice: str) -> float:
                 player_price = float(player_price_str)
                 if player_price <= 0.0:
                     raise ValueError
-                type_error = False
+                type_correct = False
             except ValueError:
                 print("\nInvalid selling price.")
         if cancel_value:
