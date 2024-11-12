@@ -50,7 +50,9 @@ Please enter a number from the list below:
 
 4. Open saved team: Open a previously saved team.
 
-5. Exit
+5. Rank players.
+
+6. Exit
 
 
 Enter number:
