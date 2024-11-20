@@ -76,7 +76,7 @@ The results that the program provides after that stage correspond to that partic
 
 ### Suggestions
 
-- A good period for you to set and choose your team is probably 5 Gameweeks, as it aligns with the form stat period of 5 matches and gives time to your picks to justify their value or a possible -4 hit.
+- A good period for you to set and choose your team is probably 5 Gameweeks, as it aligns with the form stat period of 5 matches and gives your picks time to justify their value or a possible -4 hit.
 - You can set the period to 1 Gameweek (by setting both First and Last GW to the same number) in order to pick your Gameweek captain.
 - Information on player availability (injuries etc.) is not included for now, so you have to do your own research on that matter. You can exclude unavailable players in the program.
 - The program doesn't take future price changes into account. Again, you'll have to do your own research on which players' price is going to change and act accordingly. As a general preference, try to transfer players as late as possible to avoid injuries and have better information on the FDR. Increases in your budget will eventually come anyway if you start getting good results from your players.
