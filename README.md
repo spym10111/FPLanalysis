@@ -72,7 +72,7 @@ Please enter the GW period for which you want the team to be calculated.
 First GW:
 Last GW: 
 ```
-The results that the program provides after that stage correspond to that particular period and might not be useful as a whole. You can use its different functionalities according to your preferences. The suggestions the follow are based on our experience using FPL Analysis up to this point.
+The results that the program provides after that stage correspond to that particular period and might not be useful as a whole. You can use its different functionalities according to your preferences. The suggestions that follow are based on our experience using FPL Analysis up to this point.
 
 ### Suggestions
 
