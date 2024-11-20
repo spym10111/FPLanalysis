@@ -1,4 +1,5 @@
 from fplteam import FPLteam
+import time
 
 
 print("\n---------------------------------Welcome to FPL Analysis!---------------------------------")
@@ -29,6 +30,7 @@ def menu() -> None:
                 fplteam.open_user_team()
                 fplteam.print_result()
                 fplteam.transfer_players()
+                fplteam.save_team()
             except ValueError:
                 choice = 0
                 continue
@@ -38,6 +40,7 @@ def menu() -> None:
                 # Creating the best team without any inputs
                 fplteam.create_new_team()
                 fplteam.transfer_players()
+                fplteam.save_team()
             except ValueError:
                 choice = 0
                 continue
@@ -48,6 +51,7 @@ def menu() -> None:
                 fplteam.enter_new_team()
                 fplteam.print_result()
                 fplteam.transfer_players()
+                fplteam.save_team()
             except ValueError:
                 choice = 0
                 continue
@@ -58,6 +62,7 @@ def menu() -> None:
                 fplteam.open_saved_team()
                 fplteam.print_result()
                 fplteam.transfer_players()
+                fplteam.save_team()
             except FileNotFoundError:
                 print("\nThere in no previously saved team.")
                 choice = 0
@@ -76,6 +81,7 @@ def menu() -> None:
         elif choice == 6:
             # Exits the program
             print("\nThank you for using FPL Analysis.")
+            time.sleep(2)
             break
         choice = 0
 

@@ -35,8 +35,8 @@ class FPLstats:
 
         while last_gw_number > MAX_GW_NUMBER or first_gw_number < MIN_GW_NUMBER or first_gw_number > last_gw_number:
             try:
-                print("\nThe program needs to calculate player points based on their stats and upcoming games."
-                      "\nPlease enter the GW period for which you want the team to be calculated.")
+                print("\nThe program needs to calculate points based on the players' stats and upcoming games."
+                      "\nPlease enter the GW period for which you want the points to be calculated.")
                 first_gw_number = int(input("\nFirst GW: "))
                 last_gw_number = int(input("Last GW: "))
             except ValueError:
@@ -66,17 +66,6 @@ class FPLstats:
         for player_team in self.player_data["team"]:
             fdr_index.append(self.fdr_data.index[self.fdr_data["team"] == player_team].tolist()[0])
 
-        # Calculating FDR as a sum (Old part of the code)
-        # self.fdr_data["sum"] = self.fdr_data[fdr_gw].sum(axis="columns", numeric_only=True)
-        #
-        # self.player_data["fdr_sum"] = ""
-        # fdr_sum_list = self.player_data["fdr_sum"].to_list()
-        #
-        # for i in range(len(fdr_sum_list)):
-        #     fdr_sum_list[i] = self.fdr_data["sum"].to_list()[fdr_index[i]]
-        #
-        # self.player_data["fdr_sum"] = fdr_sum_list
-
         # Calculating FDR as a product
         mult = []
         for gw in fdr_gw:
@@ -90,54 +79,6 @@ class FPLstats:
 
         # The functions used for team selection
         self.player_data["bonus_new"] = self.player_data["bonus"] + 1
-
-        # Old part of the code that included the calculation of the FDR as a sum
-        # calculation_question = 9999
-        #
-        # while calculation_question != 1 and calculation_question != 2:
-        #     try:
-        #         calculation_question = int(input('\nType "1" if you want to calculate the FDR as a sum or'
-        #                                          ' "2" if you want to calculate the FDR as a product: '))
-        #     except ValueError:
-        #         print("\nInvalid number.")
-        #     else:
-        #         if calculation_question == 1:
-        #
-        #             # Calculating points for player comparison
-        #             self.player_data["point_calculation"] = (
-        #                     self.player_data["total_points"]
-        #                     * self.player_data["value_season"].astype(float)
-        #                     * self.player_data["points_per_game"].astype(float)
-        #                     * self.player_data["form"].astype(float)
-        #                     * self.player_data["bonus_new"]
-        #                     / self.player_data["fdr_sum"]
-        #             )
-        #
-        #             # Calculating points for captaincy comparison
-        #             self.player_data["captain_points"] = (
-        #                 self.player_data["total_points"] ** 2
-        #                 * self.player_data["points_per_game"].astype(float)
-        #                 * self.player_data["form"].astype(float)
-        #                 * self.player_data["bonus_new"]
-        #                 / self.player_data["fdr_sum"]
-        #             )
-        #
-        #             # Calculating points for transfer comparison
-        #             self.player_data["transfer_points"] = (
-        #                     np.abs(self.player_data["total_points"] - 4) ** 3
-        #                     * self.player_data["bonus_new"]
-        #                     * (self.player_data["form"].astype(float) - (4 / 5.0))
-        #                     / (
-        #                             self.player_data["cost"]
-        #                             * self.player_data["fdr_sum"]
-        #                             * gw_number
-        #                     )
-        #             )
-        #
-        #         elif calculation_question == 2:
-        #           (missing the code for product FDR calculation)
-        #         else:
-        #           print("\nInvalid answer.")
 
         # Calculating points for factor creation
         self.player_data["factor_point_calculation"] = (
