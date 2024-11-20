@@ -6,6 +6,7 @@ FPL Analysis is a project under development whose purpose is to assist managers 
 - [Installation](#installation)
 - [Usage](#usage)
   - [Suggestions](#suggestions)
+- [Known Errors](known-errors)
 
 ## Installation
 
@@ -59,7 +60,7 @@ Enter number:
 ```
 Depending on your choice the program has different functionalities. The options are shown in parentheses.
 
-For instance:
+For example:
 ```
 Do you want to exclude any players (yes/no/suggestion)?
 ```
@@ -71,6 +72,16 @@ Please enter the GW period for which you want the team to be calculated.
 First GW:
 Last GW: 
 ```
+The results that the program provides after that stage correspond to that particular period and might not be useful as a whole. You can use its different functionalities according to your preferences. The suggestions the follow are based on our experience using FPL Analysis up to this point.
+
 ### Suggestions
 
-- 
+- Always run the suggestion option before you finalise your transfer moves in the actual game. The program is not perfect and might show some irregularities from time to time. Please report anything that might seem suspicious to you. Check the known errors section for further information.
+- The suggestion option of the program provides suggestions for the given team taking into consideration a -4 hit. Based on that, the "best value probability" given is not an actual probability but rather a performance comparison based on the program's calculations. As the actual probability differs from this "performance comparison" and the odds of an accurate result are slim, up to this point we suggest you use the suggestions option (even if you take the -4 hit) for a percentage of 80% and above for better results. (Be prepared for many hits...)
+- The suggestion of a player change might differ from the actual replacement done by the program. The -4 hit calculation used in only one of the two options and not both is to blame for that. This has also shown that based on the FPL Analysis calculations players with better fantasy points output might be better when taking a -4 hit while players with easier games coming up (FDR factor) might be better if you don't.
+
+## Known Errors
+
+Known errors meant to be fixed hopefully soon. If you don't find your problem here please report it so that we can hopefully fix it.
+
+- The update option changes one player at a time. That means that double player changes might be better even though it doesn't seem so when updating your team. That is why you should always run the suggestion option (both for single and double player changes) even when creating a completely new team.
