@@ -6,7 +6,7 @@ FPL Analysis is a project under development whose purpose is to assist managers 
 - [Installation](#installation)
 - [Usage](#usage)
   - [Suggestions](#suggestions)
-- [Known Errors](known-errors)
+- [Known Errors](#known-errors)
 
 ## Installation
 
