@@ -28,7 +28,7 @@ python -m venv venv
 pip install -r requirements.txt
 python main.py
 ```
-3. Download the .zip file directly from GitHub.
+or download the .zip file directly from GitHub.
 
 ## Usage
 
