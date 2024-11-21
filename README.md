@@ -95,3 +95,7 @@ Known errors meant to be fixed hopefully soon. If you don't find your problem he
 - The program still misses the functionality for picking bench players. We hope to include it as well soon. For now, the program chooses the best possible starting 11 leaving a small budget for your bench. Try to avoid spending too much on your bench as the purpose of the program is to create the best possible 11 with minimum thought for the bench.
 - We are hoping to add some functionality on whether it's a good time to play a particular chip in the near future.
 - When creating a new team, some systems have wrong budget values given for the bench players. We are working on a fix. (Don't worry. The best systems don't have that problem, but you should try creating new teams with different systems if you want to try the limits of the program.)
+
+## Contact Information
+
+For any questions or feedback please contact us at: spym10111@outlook.com
