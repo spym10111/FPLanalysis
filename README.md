@@ -29,7 +29,7 @@ python -m venv venv
 pip install -r requirements.txt
 python main.py
 ```
-or download the .zip file directly from GitHub.
+3. Windows users can also download the .zip file directly from GitHub and run the main.exe located in the dist file.
 
 ## Usage
 
