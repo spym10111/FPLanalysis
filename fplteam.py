@@ -394,7 +394,7 @@ class FPLteam:
             elif 1 in player_not_in_team:
                 self.transfer_players()
                 return None
-
+def
     def transfer_calculation(self):
         """
         Calculates whether an extra player transfer is worth the -4 points and gives a list of suggestions.
