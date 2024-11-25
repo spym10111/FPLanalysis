@@ -10,7 +10,7 @@ FPL Analysis is a project under development whose purpose is to assist managers 
 
 ## Installation
 
-The program runs on Python 3.10.
+The program runs on Python 3.10 or higher.
 1. Install from source on Linux
 ```bash
 $ git clone https://github.com/spym10111/FPLanalysis.git
