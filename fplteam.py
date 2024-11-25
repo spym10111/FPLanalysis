@@ -364,7 +364,6 @@ class FPLteam:
 
         # Replacement part
         continue_replacement = False
-
         if len(self.unavailable_players_list) > 0:
             player_not_in_team = []
             for player in self.unavailable_players_list:
