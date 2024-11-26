@@ -10,7 +10,7 @@ FPL Analysis is a project under development whose purpose is to assist managers 
 
 ## Installation
 
-The program runs on Python 3.10.
+The program runs on Python 3.10 or higher.
 1. Install from source on Linux
 ```bash
 $ git clone https://github.com/spym10111/FPLanalysis.git
@@ -29,7 +29,7 @@ python -m venv venv
 pip install -r requirements.txt
 python main.py
 ```
-or download the .zip file directly from GitHub.
+3. Windows users can also download the .zip file directly from GitHub and run the main.exe located in the dist folder. (This option doesn't require any python versions.)
 
 ## Usage
 
@@ -98,4 +98,4 @@ Known errors meant to be fixed hopefully soon. If you don't find your problem he
 
 ## Contact Information
 
-For any questions or feedback please contact us at: spym10111@outlook.com
+For any questions or feedback please contact us at: spymfpl@gmail.com
