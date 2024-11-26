@@ -24,133 +24,31 @@ class FPLstats:
         self.fdr_data = self.fplapi.fpl_fdr()
         np.set_printoptions(legacy="1.25")
 
-    def calculate_points(self):
+    def calculate_points(self) -> None:
         """
-        Calculates the stats that are taken into account when creating the team or searching for players.
+        Calculates the stats that are taken into account when creating the team or searching for players. The results
+        are stored in the players Dataframe created in the fplapi.py.
+
+        :return: None
         """
         # Number of GWs to calculate
-        fdr_gw = []
-        first_gw_number = 9999
-        last_gw_number = 9999
-
-        while last_gw_number > MAX_GW_NUMBER or first_gw_number < MIN_GW_NUMBER or first_gw_number > last_gw_number:
-            try:
-                print("\nThe program needs to calculate points based on the players' stats and upcoming games."
-                      "\nPlease enter the GW period for which you want the points to be calculated.")
-                first_gw_number = int(input("\nFirst GW: "))
-                last_gw_number = int(input("Last GW: "))
-            except ValueError:
-                print("\nInvalid GW numbers.")
-            else:
-                if (
-                    last_gw_number > MAX_GW_NUMBER or first_gw_number < MIN_GW_NUMBER
-                        or first_gw_number > last_gw_number
-                ):
-                    print("\nInvalid GW numbers.")
-        for gw in range(first_gw_number, last_gw_number + 1):
-            fdr_gw.append(f"gw{gw}")
-
+        fdr_gw = calculate_fdr()
         # Number of GWs the statistics correspond to
-        gw_number = 0
-        while gw_number < 1 or gw_number > MAX_GW_NUMBER:
-            try:
-                gw_number = int(input("\nPlease enter the last GW played: "))
-            except ValueError:
-                print("\nInvalid GW number.")
-            else:
-                if gw_number < 1 or gw_number > MAX_GW_NUMBER:
-                    print("\nInvalid GW number.")
-
+        gw_number = gw_played()
         # Calculating the FDR part of the function
-        fdr_index = []
-        for player_team in self.player_data["team"]:
-            fdr_index.append(self.fdr_data.index[self.fdr_data["team"] == player_team].tolist()[0])
-
-        # Calculating FDR as a product
-        mult = []
-        for gw in fdr_gw:
-            mult.append(self.fdr_data[gw].tolist())
-        self.fdr_data["mult"] = reduce(np.multiply, mult)
-        self.player_data["fdr_mult"] = ""
-        fdr_mult_list = self.player_data["fdr_mult"].to_list()
-        for i in range(len(fdr_mult_list)):
-            fdr_mult_list[i] = self.fdr_data["mult"].to_list()[fdr_index[i]]
-        self.player_data["fdr_mult"] = fdr_mult_list
+        self.fdr_product(fdr_gw)
 
         # The functions used for team selection
         self.player_data["bonus_new"] = self.player_data["bonus"] + 1
-
-        # Calculating points for factor creation
-        self.player_data["factor_point_calculation"] = (
-                self.player_data["total_points"]
-                * self.player_data["value_season"].astype(float)
-                * self.player_data["points_per_game"].astype(float)
-                * self.player_data["form"].astype(float)
-                * self.player_data["bonus_new"]
-                / self.player_data["fdr_mult"]
-        )
-
+        # Calculating factor points
+        self.factor_point_calculation()
         self.calculation_factors()
-
         # Calculating points for player comparison
-        with open("factors.json", "r") as file:
-            factors = json.load(file)
-        self.player_data["point_calculation"] = (
-                self.player_data["total_points"]
-                * factors["total_points_factor"]
-                * self.player_data["value_season"].astype(float)
-                * factors["value_factor"]
-                * self.player_data["points_per_game"].astype(float)
-                * factors["points_per_game_factor"]
-                * self.player_data["form"].astype(float)
-                * factors["form_factor"]
-                * self.player_data["bonus_new"]
-                * factors["bonus_factor"]
-                / (
-                    self.player_data["fdr_mult"]
-                    * factors["fdr_factor"]
-                    * factors["point_calculation_factor"]
-                )
-        )
-
+        self.point_calculation()
         # Calculating points for captaincy comparison
-        self.player_data["captain_points"] = (
-                self.player_data["total_points"] ** 2
-                * factors["total_points_factor"] ** 2
-                * self.player_data["points_per_game"].astype(float)
-                * factors["points_per_game_factor"]
-                * self.player_data["form"].astype(float)
-                * factors["form_factor"]
-                * self.player_data["bonus_new"]
-                * factors["bonus_factor"]
-                / (
-                    self.player_data["fdr_mult"]
-                    * factors["fdr_factor"]
-                    * factors["point_calculation_factor"]
-                )
-        )
-
+        self.captain_points()
         # Calculating points for transfer comparison
-        self.player_data["transfer_points"] = (
-                np.abs(self.player_data["total_points"] - 4) ** 3
-                * factors["total_points_factor"]
-                * factors["value_factor"]
-                * factors["points_per_game_factor"]
-                * self.player_data["bonus_new"]
-                * factors["bonus_factor"]
-                * (
-                   (self.player_data["form"].astype(float)
-                    * factors["form_factor"])
-                   - (4 / 5.0)
-                )
-                / (
-                   self.player_data["cost"]
-                   * self.player_data["fdr_mult"]
-                   * factors["fdr_factor"]
-                   * factors["point_calculation_factor"]
-                   * gw_number
-                )
-        )
+        self.transfer_points(gw_number)
 
         self.player_data.sort_values(by=["point_calculation", "points_per_game"], ascending=False)
 
@@ -170,9 +68,11 @@ class FPLstats:
             [self.player_data.index[self.player_data["name"] == player_name].tolist()[0]]
         )
 
-    def calculation_factors(self):
+    def calculation_factors(self) -> None:
         """
-        Used to calculate the point formula factors for every value.
+        Used to calculate the point formula factors for every value. Creates a .json file with the values.
+
+        :return: None
         """
         player_list = []
         for name in self.player_data["name"]:
@@ -250,6 +150,172 @@ class FPLstats:
         }
         with open("factors.json", "w") as file:
             json.dump(factor_dict, file, indent=4)
+
+    def fdr_product(self, fdr_gw) -> None:
+        """
+        Calculates the FDR product part of the calculations.
+
+        :param fdr_gw: A list of the GWs included in the calculations.
+        :type fdr_gw: list
+        :return: None
+        """
+        fdr_index = []
+        for player_team in self.player_data["team"]:
+            fdr_index.append(self.fdr_data.index[self.fdr_data["team"] == player_team].tolist()[0])
+
+        # Calculating FDR as a product
+        mult = []
+        for gw in fdr_gw:
+            mult.append(self.fdr_data[gw].tolist())
+        self.fdr_data["mult"] = reduce(np.multiply, mult)
+        self.player_data["fdr_mult"] = ""
+        fdr_mult_list = self.player_data["fdr_mult"].to_list()
+        for i in range(len(fdr_mult_list)):
+            fdr_mult_list[i] = self.fdr_data["mult"].to_list()[fdr_index[i]]
+        self.player_data["fdr_mult"] = fdr_mult_list
+
+    def factor_point_calculation(self) -> None:
+        """
+        Calculates the factor points.
+
+        :return: None
+        """
+        self.player_data["factor_point_calculation"] = (
+                self.player_data["total_points"]
+                * self.player_data["value_season"].astype(float)
+                * self.player_data["points_per_game"].astype(float)
+                * self.player_data["form"].astype(float)
+                * self.player_data["bonus_new"]
+                / self.player_data["fdr_mult"]
+        )
+
+    def point_calculation(self) -> None:
+        """
+        Calculates the basic points for player comparison.
+
+        :return: None
+        """
+        with open("factors.json", "r") as file:
+            factors = json.load(file)
+        self.player_data["point_calculation"] = (
+                self.player_data["total_points"]
+                * factors["total_points_factor"]
+                * self.player_data["value_season"].astype(float)
+                * factors["value_factor"]
+                * self.player_data["points_per_game"].astype(float)
+                * factors["points_per_game_factor"]
+                * self.player_data["form"].astype(float)
+                * factors["form_factor"]
+                * self.player_data["bonus_new"]
+                * factors["bonus_factor"]
+                / (
+                        self.player_data["fdr_mult"]
+                        * factors["fdr_factor"]
+                        * factors["point_calculation_factor"]
+                )
+        )
+
+    def captain_points(self) -> None:
+        """
+        Calculates the captaincy points.
+
+        :return: None
+        """
+        with open("factors.json", "r") as file:
+            factors = json.load(file)
+        self.player_data["captain_points"] = (
+                self.player_data["total_points"] ** 2
+                * factors["total_points_factor"] ** 2
+                * self.player_data["points_per_game"].astype(float)
+                * factors["points_per_game_factor"]
+                * self.player_data["form"].astype(float)
+                * factors["form_factor"]
+                * self.player_data["bonus_new"]
+                * factors["bonus_factor"]
+                / (
+                        self.player_data["fdr_mult"]
+                        * factors["fdr_factor"]
+                        * factors["point_calculation_factor"]
+                )
+        )
+
+    def transfer_points(self, gw_number: int) -> None:
+        """
+        Calculates the transfer points.
+
+        :param gw_number: An integer of the number of GWs played.
+        :type gw_number: int
+        :return: None
+        """
+        with open("factors.json", "r") as file:
+            factors = json.load(file)
+        self.player_data["transfer_points"] = (
+                np.abs(self.player_data["total_points"] - 4) ** 3
+                * factors["total_points_factor"]
+                * factors["value_factor"]
+                * factors["points_per_game_factor"]
+                * self.player_data["bonus_new"]
+                * factors["bonus_factor"]
+                * (
+                        (self.player_data["form"].astype(float)
+                         * factors["form_factor"])
+                        - (4 / 5.0)
+                )
+                / (
+                        self.player_data["cost"]
+                        * self.player_data["fdr_mult"]
+                        * factors["fdr_factor"]
+                        * factors["point_calculation_factor"]
+                        * gw_number
+                )
+        )
+
+
+def calculate_fdr() -> list:
+    """
+    Calculates the FDR based on the user's input.
+
+    :return: A list of the GWs that are going to be included in the calculations.
+    """
+    fdr_gw = []
+    first_gw_number = 9999
+    last_gw_number = 9999
+
+    while last_gw_number > MAX_GW_NUMBER or first_gw_number < MIN_GW_NUMBER or first_gw_number > last_gw_number:
+        try:
+            print("\nThe program needs to calculate points based on the players' stats and upcoming games."
+                  "\nPlease enter the GW period for which you want the points to be calculated.")
+            first_gw_number = int(input("\nFirst GW: "))
+            last_gw_number = int(input("Last GW: "))
+        except ValueError:
+            print("\nInvalid GW numbers.")
+        else:
+            if (
+                last_gw_number > MAX_GW_NUMBER or first_gw_number < MIN_GW_NUMBER
+                or first_gw_number > last_gw_number
+            ):
+                print("\nInvalid GW numbers.")
+    for gw in range(first_gw_number, last_gw_number + 1):
+        fdr_gw.append(f"gw{gw}")
+    return fdr_gw
+
+
+def gw_played() -> int:
+    """
+    The user inputs the number of GWs played.
+
+    :return: An integer of the number of GWs played.
+    """
+    gw_number = 0
+    while gw_number < 1 or gw_number > MAX_GW_NUMBER:
+        try:
+            gw_number = int(input("\nPlease enter the last GW played: "))
+        except ValueError:
+            print("\nInvalid GW number.")
+        else:
+            if gw_number < 1 or gw_number > MAX_GW_NUMBER:
+                print("\nInvalid GW number.")
+    return gw_number
 
 
 if __name__ == "__main__":

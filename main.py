@@ -64,7 +64,7 @@ def menu() -> None:
                 fplteam.transfer_players()
                 fplteam.save_team()
             except FileNotFoundError:
-                print("\nThere in no previously saved team.")
+                print("\nThere is no previously saved team.")
                 choice = 0
                 continue
             except ValueError:

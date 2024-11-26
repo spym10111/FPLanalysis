@@ -103,7 +103,7 @@ class FPLapi:
         :type username: str
         :param password: Password used for request on the FPL API
         :type password: str
-        :return: Dictionary containing information on the user's FPL team
+        :return: A dictionary containing information on the user's FPL team
         """
         session = requests.session()
         url = "https://users.premierleague.com/accounts/login/"
