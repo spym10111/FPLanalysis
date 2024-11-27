@@ -302,11 +302,12 @@ class FPLteam:
         :return: None
         """
         continue_updating = ""
-        while continue_updating.lower() != "no":
-            continue_updating = input("\nDo you want to exclude any players (yes/no/suggestion)? ")
-            if continue_updating.lower() == "yes":
+        while continue_updating.lower() != "skip":
+            continue_updating = input("\nDo you want to exclude any players or get suggestion "
+                                      "(exclude/suggestion/skip)? ")
+            if continue_updating.lower() == "exclude":
                 break
-            elif continue_updating.lower() == "no":
+            elif continue_updating.lower() == "skip":
                 return None
             elif continue_updating.lower() == "suggestion":
                 self.transfer_calculation()
