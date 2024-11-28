@@ -90,6 +90,7 @@ The results that the program provides after that stage correspond to that partic
 
 Known errors meant to be fixed hopefully soon. If you don't find your problem here please report it so that we can hopefully fix it.
 
+- Unfortunately, connecting through a social media account that is not connected with a Premier League account is not possible for now.
 - When creating a new team the bank budget displayed in the end is always 0. We are working on a fix.
 - The update option changes one player at a time. That means that double player changes might be better due to better budget management even though it doesn't seem so when updating your team. That is why you should always run the suggestion option (both for single and double player changes) even when creating a completely new team.
 - The program still misses the functionality for picking bench players. We hope to include it as well soon. For now, the program chooses the best possible starting 11 leaving a small budget for your bench. Try to avoid spending too much on your bench as the purpose of the program is to create the best possible 11 with minimum thought for the bench.
