@@ -209,9 +209,9 @@ class FPLstats:
                 * self.player_data["bonus_new"]
                 * factors["bonus_factor"]
                 / (
-                        self.player_data["fdr_mult"]
-                        * factors["fdr_factor"]
-                        * factors["point_calculation_factor"]
+                   self.player_data["fdr_mult"]
+                   * factors["fdr_factor"]
+                   * factors["point_calculation_factor"]
                 )
         )
 
@@ -233,9 +233,9 @@ class FPLstats:
                 * self.player_data["bonus_new"]
                 * factors["bonus_factor"]
                 / (
-                        self.player_data["fdr_mult"]
-                        * factors["fdr_factor"]
-                        * factors["point_calculation_factor"]
+                   self.player_data["fdr_mult"]
+                   * factors["fdr_factor"]
+                   * factors["point_calculation_factor"]
                 )
         )
 
@@ -257,16 +257,16 @@ class FPLstats:
                 * self.player_data["bonus_new"]
                 * factors["bonus_factor"]
                 * (
-                        (self.player_data["form"].astype(float)
-                         * factors["form_factor"])
-                        - (4 / 5.0)
+                   (self.player_data["form"].astype(float)
+                    * factors["form_factor"])
+                   - (4 / 5.0)
                 )
                 / (
-                        self.player_data["cost"]
-                        * self.player_data["fdr_mult"]
-                        * factors["fdr_factor"]
-                        * factors["point_calculation_factor"]
-                        * gw_number
+                   self.player_data["cost"]
+                   * self.player_data["fdr_mult"]
+                   * factors["fdr_factor"]
+                   * factors["point_calculation_factor"]
+                   * gw_number
                 )
         )
 

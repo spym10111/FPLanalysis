@@ -60,6 +60,7 @@ class FPLteam:
         self.points_sum += self.fpl.player_stat(player, "point_calculation")
         self.player_teams.append(self.fpl.player_stat(player, "team"))
         self.starters_budget += round(self.fpl.player_stat(player, "cost"), 1)
+        self.bank_budget -= round(self.fpl.player_stat(player, "cost"), 1)
         self.player_points.append(self.fpl.player_stat(player, "point_calculation"))
         self.captain_points.append(self.fpl.player_stat(player, "captain_points"))
 
@@ -75,6 +76,7 @@ class FPLteam:
         self.points_sum -= self.fpl.player_stat(player, "point_calculation")
         self.player_teams.pop(self.team.index(player))
         self.starters_budget -= round(self.fpl.player_stat(player, "cost"), 1)
+        self.bank_budget += round(self.fpl.player_stat(player, "cost"), 1)
         self.player_points.pop(self.team.index(player))
         self.captain_points.pop(self.team.index(player))
         self.team.remove(player)
@@ -106,8 +108,8 @@ class FPLteam:
 
         :return: None
         """
-        print(f"\nIn the bank: {self.bank_budget}")
-        print(f"Squad transfer value: {round(self.starters_budget, 2)}")
+        print(f"\nIn the bank: {round(self.bank_budget, 1)}")
+        print(f"Squad transfer value: {round(self.starters_budget, 1)}")
         print(f"Squad: {self.team}")
         print(f"Potential captains: 1) {self.team[self.captain_points.index(max(self.captain_points))]}"
               f"\t2) {self.team[self.captain_points.index(sorted(self.captain_points)[-2])]}")
@@ -123,6 +125,7 @@ class FPLteam:
         """
         self.reset_info()
         self.choose_system()
+        self.bank_budget = 100.0 - 16.5
 
         self.create_loop_players()
         self.update_team()
@@ -323,6 +326,7 @@ class FPLteam:
                 and unavailable_player.lower() != "update"
                 and unavailable_player.lower() != "suggestion"
         ):
+            invalid_check.clear()
             unavailable_player = input("\nAdd players to the exclusion list "
                                        "(player/suggestion/all/update/none/stop): ")
             if unavailable_player.lower() == "stop":
@@ -350,11 +354,10 @@ class FPLteam:
                         print("\nThe player is already excluded.")
             for name in self.fpl.player_data["name"]:
                 if (
-                        unidecode(unavailable_player.lower()) != unidecode(self.fpl.player_stat(name, "name").lower())
-                        and unavailable_player.lower() != "all"
-                        and unavailable_player.lower() != "no"
-                        and unavailable_player.lower() != "update"
-                        and unavailable_player.lower() != "suggestion"
+                    unidecode(unavailable_player.lower()) != unidecode(self.fpl.player_stat(name, "name").lower())
+                    and unavailable_player.lower() != "all"
+                    and unavailable_player.lower() != "update"
+                    and unavailable_player.lower() != "suggestion"
                 ):
                     invalid_check.append(1)
                 else:
@@ -581,6 +584,9 @@ class FPLteam:
         :type budget_choice: str
         :return: None
         """
+        if budget_choice.lower() == "no":
+            self.bank_budget += 100.0 - 16.5
+
         if budget_choice.lower() == "yes":
             self.starters_budget = round(sum(self.starters_prices), 1)
 
@@ -1115,8 +1121,8 @@ class FPLteam:
                     ):
                         # Check team limit
                         if player_team_number < 4:
-                            possible_transfers[key].insert(0, name)
-                            possible_transfers[key].remove(team_player)
+                            possible_transfers[key] = list(map(lambda x: x.replace(team_player, name),
+                                                               possible_transfers[key]))
 
                             teams_transfer[0].insert(0, self.fpl.player_stat(name, "team"))
                             teams_transfer[0].remove(self.fpl.player_stat(
@@ -1127,8 +1133,8 @@ class FPLteam:
                             break
                     else:
                         if player_team_number < 3:
-                            possible_transfers[key].insert(0, name)
-                            possible_transfers[key].remove(team_player)
+                            possible_transfers[key] = list(map(lambda x: x.replace(team_player, name),
+                                                               possible_transfers[key]))
 
                             teams_transfer[0].insert(0, self.fpl.player_stat(name, "team"))
                             teams_transfer[0].remove(self.fpl.player_stat(
@@ -1191,8 +1197,8 @@ class FPLteam:
                     ):
                         # Check team limit
                         if player_team_number < 4:
-                            possible_transfers[key].insert(0, name)
-                            possible_transfers[key].remove(team_player)
+                            possible_transfers[key] = list(map(lambda x: x.replace(team_player, name),
+                                                               possible_transfers[key]))
 
                             teams_transfer[0].insert(0, self.fpl.player_stat(name, "team"))
                             teams_transfer[0].remove(self.fpl.player_stat(
@@ -1230,8 +1236,8 @@ class FPLteam:
                                 ):
                                     used_players.append(player)
                         if player_team_number < 3:
-                            possible_transfers[key].insert(0, name)
-                            possible_transfers[key].remove(team_player)
+                            possible_transfers[key] = list(map(lambda x: x.replace(team_player, name),
+                                                               possible_transfers[key]))
 
                             teams_transfer[0].insert(0, self.fpl.player_stat(name, "team"))
                             teams_transfer[0].remove(self.fpl.player_stat(
@@ -1259,10 +1265,9 @@ class FPLteam:
             for player in possible_transfers[key]:
                 player_budget += self.fpl.player_stat(player, "cost")
             max_budget.append(round(player_budget, 1))
-            transfer_points = [self.fpl.player_stat(player, "point_calculation")
-                               for player in possible_transfers[key]]
-            starting_transfer_points = sum(transfer_points)
-            starting_transfer_points_list.append(starting_transfer_points)
+            changing_player_points = [self.fpl.player_stat(player, "point_calculation")
+                                      for player in possible_transfers[key]]
+            starting_transfer_points_list.append(changing_player_points)
         all_teams = self.pl_all_teams()
 
         for key in possible_transfers.keys():
@@ -1289,13 +1294,16 @@ class FPLteam:
                             self.transfer_double_more_loops(used_players, possible_transfers, key, team_player,
                                                             max_budget, teams, teams_transfer)
 
-            final_transfer_points = sum([self.fpl.player_stat(player, "transfer_points")
-                                         for player in possible_transfers[key]])
-            if starting_transfer_points_list[key] > final_transfer_points:
+            final_transfer_points = [self.fpl.player_stat(player, "transfer_points")
+                                     for player in possible_transfers[key]]
+            if sum(starting_transfer_points_list[key]) > sum(final_transfer_points):
                 print("-")
             else:
-                value_possibility = round(final_transfer_points
-                                          / (starting_transfer_points_list[key] + final_transfer_points) * 100, 2)
+                value_possibility = round(((final_transfer_points[0]/(final_transfer_points[0]
+                                                                      + starting_transfer_points_list[key][0]))
+                                          + (final_transfer_points[1]/(final_transfer_points[1]
+                                                                       + starting_transfer_points_list[key][1])))
+                                          / 2 * 100, 2)
                 player_string = "["
                 for player in possible_transfers[key]:
                     player_string += f"'{player}', "
