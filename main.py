@@ -1,8 +1,8 @@
 from fplteam import FPLteam
 import time
+import header
 
-
-print("\n---------------------------------Welcome to FPL Analysis!---------------------------------")
+header.print_header()
 
 
 def menu() -> None:
@@ -13,7 +13,9 @@ def menu() -> None:
     """
     choice = 0
     while choice not in [1, 2, 3, 4, 5]:
-        print("\n\nPlease enter a number from the list below: ")
+        print("\n\n-------------------------------------Main Menu------------------------------------"
+              "-----------------")
+        print("\nPlease enter a number from the list below: ")
         print("\n\n1. Sign in to your FPL account: Use your FPL log-in information to get your team.")
         print("\n2. Create new team: The program creates the best possible team for you.")
         print("\n3. Enter new team: You manually enter your team.")

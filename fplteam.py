@@ -870,6 +870,8 @@ class FPLteam:
                                     and player_team_number > 2
                                     # Check team
                                     and self.fpl.player_stat(player, "team") == self.fpl.player_stat(name, "team")
+                                    # Don't enter the name twice in the list
+                                    and name not in used_players
                                 ):
                                     used_players.append(name)
                                 elif (
@@ -883,6 +885,8 @@ class FPLteam:
                                       and player_team_number > 2
                                       # Check team
                                       and self.fpl.player_stat(player, "team") == self.fpl.player_stat(name, "team")
+                                      # Don't enter the name twice in the list
+                                      and player not in used_players
                                 ):
                                     used_players.append(player)
                         if player_team_number < 3:
@@ -990,6 +994,8 @@ class FPLteam:
                                     # Check team
                                     and self.fpl.player_stat(player, "team")
                                     == self.fpl.player_stat(name, "team")
+                                    # Don't enter the name twice in the list
+                                    and name not in used_players
                                 ):
                                     used_players.append(name)
                                 elif (
@@ -1003,6 +1009,8 @@ class FPLteam:
                                       and player_team_number > 2
                                       # Check team
                                       and self.fpl.player_stat(player, "team") == self.fpl.player_stat(name, "team")
+                                      # Don't enter the name twice in the list
+                                      and player not in used_players
                                 ):
                                     used_players.append(player)
                         if player_team_number < 3:
@@ -1222,6 +1230,8 @@ class FPLteam:
                                     > self.fpl.player_stat(name, "transfer_points") > 0
                                     # Check team limit
                                     and player_team_number > 2
+                                    # Don't enter the name twice in the list
+                                    and name not in used_players
                                 ):
                                     used_players.append(name)
                                 elif (
@@ -1233,6 +1243,8 @@ class FPLteam:
                                       < self.fpl.player_stat(name, "transfer_points")
                                       # Check team limit
                                       and player_team_number > 2
+                                      # Don't enter the name twice in the list
+                                      and player not in used_players
                                 ):
                                     used_players.append(player)
                         if player_team_number < 3:
@@ -1296,20 +1308,20 @@ class FPLteam:
 
             final_transfer_points = [self.fpl.player_stat(player, "transfer_points")
                                      for player in possible_transfers[key]]
-            if sum(starting_transfer_points_list[key]) > sum(final_transfer_points):
+            value_possibility = round(((final_transfer_points[0] / (final_transfer_points[0]
+                                                                    + starting_transfer_points_list[key][0]))
+                                       + (final_transfer_points[1] / (final_transfer_points[1]
+                                                                      + starting_transfer_points_list[key][1])))
+                                      / 2 * 100, 2)
+            if value_possibility < 50:
                 print("-")
             else:
-                value_possibility = round(((final_transfer_points[0]/(final_transfer_points[0]
-                                                                      + starting_transfer_points_list[key][0]))
-                                          + (final_transfer_points[1]/(final_transfer_points[1]
-                                                                       + starting_transfer_points_list[key][1])))
-                                          / 2 * 100, 2)
                 player_string = "["
                 for player in possible_transfers[key]:
                     player_string += f"'{player}', "
                 player_string = player_string[:-2] + "]"
-                print("Players\t\t\t\tBetter Value Possibility")
-                print(f"{player_string:<32}{value_possibility} %")
+                print("Players\t\t\t\t\tBetter Value Possibility")
+                print(f"{player_string:<40}{value_possibility} %")
 
     def transfer_combinations(self) -> dict:
         """

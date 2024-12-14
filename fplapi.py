@@ -155,4 +155,4 @@ class FPLapi:
 
 
 if __name__ == "__main__":
-    print(FPLapi().get_team())
+    print(FPLapi().fixtures_df)

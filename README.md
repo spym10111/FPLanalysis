@@ -1,14 +1,20 @@
-# FPL Analysis
+        ███████╗██████╗ ██╗          █████╗ ███╗   ██╗ █████╗ ██╗  ██╗   ██╗███████╗██╗███████╗
+        ██╔════╝██╔══██╗██║         ██╔══██╗████╗  ██║██╔══██╗██║  ╚██╗ ██╔╝██╔════╝██║██╔════╝
+        █████╗  ██████╔╝██║         ███████║██╔██╗ ██║███████║██║   ╚████╔╝ ███████╗██║███████╗
+        ██╔══╝  ██╔═══╝ ██║         ██╔══██║██║╚██╗██║██╔══██║██║    ╚██╔╝  ╚════██║██║╚════██║
+        ██║     ██║     ███████╗    ██║  ██║██║ ╚████║██║  ██║███████╗██║   ███████║██║███████║
+        ╚═╝     ╚═╝     ╚══════╝    ╚═╝  ╚═╝╚═╝  ╚═══╝╚═╝  ╚═╝╚══════╝╚═╝   ╚══════╝╚═╝╚══════╝
 
 FPL Analysis is a project under development whose purpose is to assist managers with their Fantasy Premier League team  management.
 
-## Table of Contents
+# Table of Contents
 - [Installation](#installation)
 - [Usage](#usage)
   - [Suggestions](#suggestions)
 - [Known Errors](#known-errors)
+- [Contact Information](#contact-information)
 
-## Installation
+# Installation
 
 The program runs on Python 3.10 or higher.
 1. Install from source on Linux
@@ -31,14 +37,13 @@ python main.py
 ```
 3. Windows users can also download the .zip file directly from GitHub and run the main.exe located in the dist folder. (This option doesn't require any python versions.)
 
-## Usage
+# Usage
 
 FPL Analysis automatically creates or updates a Fantasy team for you. The suggestions the program provides are given based on the players' previous FPL performance and are by no means based on their actual game performance. That means that it calculates each player's value based solely on FPL stats, avoiding his actual statistical value as a player, even though it may have an impact in the final comparison with other players. Although not perfect, FPL Analysis can still give a useful insight into the game and provide fast suggestions to FPL managers.
 
 The use is pretty straightforward for now. Just running the main.py opens the main menu.
 ```
----------------------------------Welcome to FPL Analysis!---------------------------------
-
+-------------------------------------Main Menu-----------------------------------------------------
 
 Please enter a number from the list below:
 
@@ -56,25 +61,25 @@ Please enter a number from the list below:
 6. Exit
 
 
-Enter number:
+Enter number: 
 ```
 Depending on your choice the program has different functionalities. The options are shown in parentheses.
 
 For example:
 ```
-Do you want to exclude any players (yes/no/suggestion)?
+Do you want to exclude any players or get suggestion (exclude/suggestion/skip)?
 ```
 The program will first ask for a Gameweek period for which to calculate the optimal suggestions.
 ```
-The program needs to calculate player points based on their stats and upcoming games.
-Please enter the GW period for which you want the team to be calculated.
+The program needs to calculate points based on the players' stats and upcoming games.
+Please enter the GW period for which you want the points to be calculated.
 
-First GW:
+First GW: 
 Last GW: 
 ```
 The results that the program provides after that stage correspond to that particular period and might not be useful as a whole. You can use its different functionalities according to your preferences. The suggestions that follow are based on our experience using FPL Analysis up to this point.
 
-### Suggestions
+## Suggestions
 
 - A good period for you to set and choose your team is probably 5 Gameweeks, as it aligns with the form stat period of 5 matches and gives your picks time to justify their value or a possible -4 hit.
 - You can set the period to 1 Gameweek (by setting both First and Last GW to the same number) in order to pick your Gameweek captain.
@@ -87,7 +92,7 @@ The results that the program provides after that stage correspond to that partic
 - The suggestion of a player change might differ from the actual replacement done by the program. The -4 hit calculation used in only one of the two options and not both is to blame for that. This has also shown that based on the FPL Analysis calculations players with better fantasy points output might be better if you take a -4 hit while players with easier games coming up (FDR factor) might be better if you don't.
 - FPL Analysis should be used for a better overall season performance. Temporary one Gameweek replacements might not have the expected results. On that note, please avoid betting real money using our program as a guide. The suggestions that the program provides still have a chance to fail.
 
-## Known Errors
+# Known Errors
 
 Known errors meant to be fixed hopefully soon. If you don't find your problem here please report it so that we can hopefully fix it.
 
@@ -98,6 +103,6 @@ Known errors meant to be fixed hopefully soon. If you don't find your problem he
 - We are hoping to add some functionality on whether it's a good time to play a particular chip in the near future.
 - When creating a new team, some systems have wrong budget values given for the bench players. We are working on a fix. (Don't worry. The best systems don't have that problem, but you should try creating new teams with different systems if you want to try the limits of the program.)
 
-## Contact Information
+# Contact Information
 
 For any questions or feedback please contact us at: spymfpl@gmail.com
