@@ -26,60 +26,90 @@ def menu() -> None:
         choice = pick_menu_number()
         print("")
         if choice == 1:
-            fplteam = FPLteam()
             try:
-                # Using log-in information
-                fplteam.open_user_team()
-                fplteam.print_result()
-                fplteam.transfer_players()
-                fplteam.save_team()
-            except ValueError:
-                choice = 0
-                continue
+                fplteam = FPLteam()
+                try:
+                    # Using log-in information
+                    fplteam.open_user_team()
+                    fplteam.print_result()
+                    fplteam.transfer_players()
+                    fplteam.save_team()
+                except ValueError:
+                    choice = 0
+                    continue
+            except NotImplementedError:
+                print("Unfortunately, the FPL official game is updating. The program will now exit. "
+                      "\nThank you for using FPL Analysis. Please come back later.")
+                time.sleep(7)
+                break
         elif choice == 2:
-            fplteam = FPLteam()
             try:
-                # Creating the best team without any inputs
-                fplteam.create_new_team()
-                fplteam.transfer_players()
-                fplteam.save_team()
-            except ValueError:
-                choice = 0
-                continue
+                fplteam = FPLteam()
+                try:
+                    # Creating the best team without any inputs
+                    fplteam.create_new_team()
+                    fplteam.transfer_players()
+                    fplteam.save_team()
+                except ValueError:
+                    choice = 0
+                    continue
+            except NotImplementedError:
+                print("Unfortunately, the FPL official game is updating. The program will now exit. "
+                      "\nThank you for using FPL Analysis. Please come back later.")
+                time.sleep(7)
+                break
         elif choice == 3:
-            fplteam = FPLteam()
             try:
-                # Creating a new team by entering names
-                fplteam.enter_new_team()
-                fplteam.print_result()
-                fplteam.transfer_players()
-                fplteam.save_team()
-            except ValueError:
-                choice = 0
-                continue
+                fplteam = FPLteam()
+                try:
+                    # Creating a new team by entering names
+                    fplteam.enter_new_team()
+                    fplteam.print_result()
+                    fplteam.transfer_players()
+                    fplteam.save_team()
+                except ValueError:
+                    choice = 0
+                    continue
+            except NotImplementedError:
+                print("Unfortunately, the FPL official game is updating. The program will now exit. "
+                      "\nThank you for using FPL Analysis. Please come back later.")
+                time.sleep(7)
+                break
         elif choice == 4:
-            fplteam = FPLteam()
             try:
-                # Using a previously saved team
-                fplteam.open_saved_team()
-                fplteam.print_result()
-                fplteam.transfer_players()
-                fplteam.save_team()
-            except FileNotFoundError:
-                print("\nThere is no previously saved team.")
-                choice = 0
-                continue
-            except ValueError:
-                choice = 0
-                continue
+                fplteam = FPLteam()
+                try:
+                    # Using a previously saved team
+                    fplteam.open_saved_team()
+                    fplteam.print_result()
+                    fplteam.transfer_players()
+                    fplteam.save_team()
+                except FileNotFoundError:
+                    print("\nThere is no previously saved team.")
+                    choice = 0
+                    continue
+                except ValueError:
+                    choice = 0
+                    continue
+            except NotImplementedError:
+                print("Unfortunately, the FPL official game is updating. The program will now exit. "
+                      "\nThank you for using FPL Analysis. Please come back later.")
+                time.sleep(7)
+                break
         elif choice == 5:
-            fplteam = FPLteam()
             try:
-                # Comparing players' captaincy points
-                fplteam.compare_players()
-            except ValueError:
-                choice = 0
-                continue
+                fplteam = FPLteam()
+                try:
+                    # Comparing players' captaincy points
+                    fplteam.compare_players()
+                except ValueError:
+                    choice = 0
+                    continue
+            except NotImplementedError:
+                print("Unfortunately, the FPL official game is updating. The program will now exit. "
+                      "\nThank you for using FPL Analysis. Please come back later.")
+                time.sleep(7)
+                break
         elif choice == 6:
             # Exits the program
             print("\nThank you for using FPL Analysis.")

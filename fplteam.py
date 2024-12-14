@@ -182,9 +182,7 @@ class FPLteam:
 
                 status_raise = False
             except TypeError:
-                print("\nInvalid e-mail or password. Remember: If the game is updating or games are "
-                      "still being played you might keep getting this notice even if your e-mail "
-                      "and password are correct.")
+                print("\nInvalid e-mail or password.")
 
     def compare_players(self) -> None:
         """
