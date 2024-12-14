@@ -43,7 +43,7 @@ FPL Analysis automatically creates or updates a Fantasy team for you. The sugges
 
 The use is pretty straightforward for now. Just running the main.py opens the main menu.
 ```
--------------------------------------Main Menu-----------------------------------------------------
+-------------------------------------Main Menu-------------------------------------------------
 
 Please enter a number from the list below:
 
