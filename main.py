@@ -1,8 +1,8 @@
 from fplteam import FPLteam
 import time
-import header
+import logos
 
-header.print_header()
+logos.print_header()
 
 
 def menu() -> None:
