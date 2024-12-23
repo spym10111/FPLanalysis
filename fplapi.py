@@ -1,4 +1,5 @@
 import requests
+import numpy as np
 import pandas as pd
 from functools import cache
 
@@ -64,6 +65,7 @@ class FPLapi:
 
         :return: A dataframe containing FDR information
         """
+        np.set_printoptions(legacy="1.25")
         base_url = "https://fantasy.premierleague.com/api/"
         r = requests.get(f"{base_url}fixtures", verify=True).json()
         r_2 = requests.get(f"{base_url}bootstrap-static/", verify=True).json()
@@ -78,19 +80,23 @@ class FPLapi:
         data = []
         for team in teams["short_name"]:
             team_list = [team]
+            gw_count = []
             for i in fixtures["id"]:
                 if (
                     fixtures["team_a"][fixtures.index[i == fixtures["id"]].tolist()[0]]
-                        == teams["id"][teams.index[team == teams["short_name"]].tolist()[0]]
+                    == teams["id"][teams.index[team == teams["short_name"]].tolist()[0]]
+                    and pd.isna(fixtures["event"][fixtures.index[i == fixtures["id"]].tolist()[0]]) is False
                 ):
                     team_list.append(fixtures["team_a_difficulty"][fixtures.index[i == fixtures["id"]].tolist()[0]])
+                    gw_count.append(fixtures["event"][fixtures.index[i == fixtures["id"]].tolist()[0]])
                 elif (
                     fixtures["team_h"][fixtures.index[i == fixtures["id"]].tolist()[0]]
-                        == teams["id"][teams.index[team == teams["short_name"]].tolist()[0]]
+                    == teams["id"][teams.index[team == teams["short_name"]].tolist()[0]]
+                    and pd.isna(fixtures["event"][fixtures.index[i == fixtures["id"]].tolist()[0]]) is False
                 ):
                     team_list.append(fixtures["team_h_difficulty"][fixtures.index[i == fixtures["id"]].tolist()[0]])
+                    gw_count.append(fixtures["event"][fixtures.index[i == fixtures["id"]].tolist()[0]])
             data.append(team_list)
-
         self.fixtures_df = pd.DataFrame(data, columns=column_names)
         return self.fixtures_df
 
