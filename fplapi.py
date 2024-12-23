@@ -78,7 +78,7 @@ class FPLapi:
         data = []
         for team in teams["short_name"]:
             team_list = [team]
-            for i in fixtures["id"]:
+            for i in fixtures["id"]:sdfkjsdhfs
                 if (
                     fixtures["team_a"][fixtures.index[i == fixtures["id"]].tolist()[0]]
                         == teams["id"][teams.index[team == teams["short_name"]].tolist()[0]]
