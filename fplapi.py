@@ -99,8 +99,30 @@ class FPLapi:
             for n in range(1, 39):
                 if n not in gw_count:
                     gw_count.insert(n-1, float(n))
+                    for i in fixtures["id"]:
+                        if (
+                            fixtures["team_a"][fixtures.index[i == fixtures["id"]].tolist()[0]]
+                            == teams["id"][teams.index[team == teams["short_name"]].tolist()[0]]
+                            and pd.isna(fixtures["event"][fixtures.index[i == fixtures["id"]].tolist()[0]])
+                        ):
+                            team_list.insert(
+                                n, "test"
+                            )
+                            # team_list.insert(
+                            #     n, fixtures["team_a_difficulty"][fixtures.index[i == fixtures["id"]].tolist()[0]]
+                            # )
+                        elif (
+                              fixtures["team_h"][fixtures.index[i == fixtures["id"]].tolist()[0]]
+                              == teams["id"][teams.index[team == teams["short_name"]].tolist()[0]]
+                              and pd.isna(fixtures["event"][fixtures.index[i == fixtures["id"]].tolist()[0]])
+                        ):
+                            team_list.insert(
+                                n, "test"
+                            )
+                            # team_list.insert(
+                            #     n, fixtures["team_h_difficulty"][fixtures.index[i == fixtures["id"]].tolist()[0]]
+                            # )
             data.append(team_list)
-            print(gw_count)
         self.fixtures_df = pd.DataFrame(data, columns=column_names)
         return self.fixtures_df
 
