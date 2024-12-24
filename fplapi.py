@@ -96,7 +96,11 @@ class FPLapi:
                 ):
                     team_list.append(fixtures["team_h_difficulty"][fixtures.index[i == fixtures["id"]].tolist()[0]])
                     gw_count.append(fixtures["event"][fixtures.index[i == fixtures["id"]].tolist()[0]])
+            for n in range(1, 39):
+                if n not in gw_count:
+                    gw_count.insert(n-1, float(n))
             data.append(team_list)
+            print(gw_count)
         self.fixtures_df = pd.DataFrame(data, columns=column_names)
         return self.fixtures_df
 
