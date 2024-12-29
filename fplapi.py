@@ -180,5 +180,23 @@ class FPLapi:
         return team_dict
 
 
+def gw_played():
+    """
+    Returns the last Gameweek played.
+
+    :return: An integer of the last Gameweek played
+    """
+    base_url = "https://fantasy.premierleague.com/api/"
+    r = requests.get(f"{base_url}bootstrap-static/", verify=True).json()
+
+    events = pd.json_normalize(r["events"])
+
+    last_gw = 0
+    for n in events["id"]:
+        if events["finished"].tolist()[n-1]:
+            last_gw = n
+    return last_gw
+
+
 if __name__ == "__main__":
-    print(FPLapi().fixtures_df)
+    print(gw_played())

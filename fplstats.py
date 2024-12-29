@@ -1,5 +1,7 @@
 import numpy as np
 from functools import reduce, cache
+
+import fplapi
 from fplapi import FPLapi
 from itertools import combinations
 import json
@@ -34,7 +36,7 @@ class FPLstats:
         # Number of GWs to calculate
         fdr_gw = calculate_fdr()
         # Number of GWs the statistics correspond to
-        gw_number = gw_played()
+        gw_number = fplapi.gw_played()
         # Calculating the FDR part of the function
         self.fdr_product(fdr_gw)
 
@@ -298,24 +300,6 @@ def calculate_fdr() -> list:
     for gw in range(first_gw_number, last_gw_number + 1):
         fdr_gw.append(f"gw{gw}")
     return fdr_gw
-
-
-def gw_played() -> int:
-    """
-    The user inputs the number of GWs played.
-
-    :return: An integer of the number of GWs played.
-    """
-    gw_number = 0
-    while gw_number < 1 or gw_number > MAX_GW_NUMBER:
-        try:
-            gw_number = int(input("\nPlease enter the last GW played: "))
-        except ValueError:
-            print("\nInvalid GW number.")
-        else:
-            if gw_number < 1 or gw_number > MAX_GW_NUMBER:
-                print("\nInvalid GW number.")
-    return gw_number
 
 
 if __name__ == "__main__":
