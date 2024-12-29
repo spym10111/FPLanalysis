@@ -38,9 +38,7 @@ def menu() -> None:
                     choice = 0
                     continue
             except NotImplementedError:
-                print("Unfortunately, the FPL official game is updating. The program will now exit. "
-                      "\nThank you for using FPL Analysis. Please come back later.")
-                time.sleep(7)
+                updating_delay()
                 break
         elif choice == 2:
             try:
@@ -54,9 +52,7 @@ def menu() -> None:
                     choice = 0
                     continue
             except NotImplementedError:
-                print("Unfortunately, the FPL official game is updating. The program will now exit. "
-                      "\nThank you for using FPL Analysis. Please come back later.")
-                time.sleep(7)
+                updating_delay()
                 break
         elif choice == 3:
             try:
@@ -71,9 +67,7 @@ def menu() -> None:
                     choice = 0
                     continue
             except NotImplementedError:
-                print("Unfortunately, the FPL official game is updating. The program will now exit. "
-                      "\nThank you for using FPL Analysis. Please come back later.")
-                time.sleep(7)
+                updating_delay()
                 break
         elif choice == 4:
             try:
@@ -92,9 +86,7 @@ def menu() -> None:
                     choice = 0
                     continue
             except NotImplementedError:
-                print("Unfortunately, the FPL official game is updating. The program will now exit. "
-                      "\nThank you for using FPL Analysis. Please come back later.")
-                time.sleep(7)
+                updating_delay()
                 break
         elif choice == 5:
             try:
@@ -106,9 +98,7 @@ def menu() -> None:
                     choice = 0
                     continue
             except NotImplementedError:
-                print("Unfortunately, the FPL official game is updating. The program will now exit. "
-                      "\nThank you for using FPL Analysis. Please come back later.")
-                time.sleep(7)
+                updating_delay()
                 break
         elif choice == 6:
             # Exits the program
@@ -134,6 +124,27 @@ def pick_menu_number() -> int:
             print("\nInvalid number.")
             choice = ""
     return choice
+
+
+def updating_delay():
+    """
+    Gives an exit sequence in case the game is updating.
+
+    :return: None
+    """
+    print("Unfortunately, the FPL official game is updating. The program will now exit. "
+          "\nThank you for using FPL Analysis. Please come back later.")
+    time.sleep(2)
+    print("5...")
+    time.sleep(1)
+    print("4...")
+    time.sleep(1)
+    print("3...")
+    time.sleep(1)
+    print("2...")
+    time.sleep(1)
+    print("1...")
+    time.sleep(1)
 
 
 menu()
