@@ -5,7 +5,7 @@ a = Analysis(
     ['main.py'],
     pathex=[],
     binaries=[],
-    datas=[],
+    datas=[('Premier_League_Icon_Cropped.ico', '.')],
     hiddenimports=[],
     hookspath=[],
     hooksconfig={},
