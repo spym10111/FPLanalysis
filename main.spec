@@ -32,6 +32,7 @@ exe = EXE(
     target_arch=None,
     codesign_identity=None,
     entitlements_file=None,
+    icon=['Premier_League_Icon_Cropped.ico'],
 )
 coll = COLLECT(
     exe,

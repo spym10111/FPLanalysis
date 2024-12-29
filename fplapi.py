@@ -180,6 +180,7 @@ class FPLapi:
         return team_dict
 
 
+@cache
 def gw_played():
     """
     Returns the last Gameweek played.
