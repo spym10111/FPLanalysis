@@ -1598,5 +1598,4 @@ def user_get_password() -> str:
 
 
 if __name__ == "__main__":
-    test_name = saved_get_username()
-    print(saved_get_password(test_name))
+    print("nothing")

@@ -34,7 +34,8 @@ class FPLstats:
         :return: None
         """
         # Number of GWs to calculate
-        fdr_gw = calculate_fdr()
+        fdr_list = fdr_input()
+        fdr_gw = calculate_fdr(fdr_list[0], fdr_list[1])
         # Number of GWs the statistics correspond to
         gw_number = fplapi.gw_played()
         # Calculating the FDR part of the function
@@ -153,7 +154,7 @@ class FPLstats:
         with open("factors.json", "w") as file:
             json.dump(factor_dict, file, indent=4)
 
-    def fdr_product(self, fdr_gw) -> None:
+    def fdr_product(self, fdr_gw: list) -> None:
         """
         Calculates the FDR product part of the calculations.
 
@@ -273,13 +274,12 @@ class FPLstats:
         )
 
 
-def calculate_fdr() -> list:
+def fdr_input() -> list:
     """
-    Calculates the FDR based on the user's input.
+    Requests an input of the GW period for the calculations.
 
-    :return: A list of the GWs that are going to be included in the calculations.
+    :return: A list of the first and last GW from the input
     """
-    fdr_gw = []
     first_gw_number = 9999
     last_gw_number = 9999
 
@@ -297,6 +297,20 @@ def calculate_fdr() -> list:
                 or first_gw_number > last_gw_number
             ):
                 print("\nInvalid GW numbers.")
+    return [first_gw_number, last_gw_number]
+
+
+def calculate_fdr(first_gw_number: int, last_gw_number: int) -> list:
+    """
+    Calculates the FDR based on the user's input.
+
+    :param first_gw_number: An integer of the input of the first GW
+    :type first_gw_number: int
+    :param last_gw_number: An integer of the input of the last GW
+    :type last_gw_number: int
+    :return: A list of the GWs that are going to be included in the calculations.
+    """
+    fdr_gw = []
     for gw in range(first_gw_number, last_gw_number + 1):
         fdr_gw.append(f"gw{gw}")
     return fdr_gw
