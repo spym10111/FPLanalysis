@@ -507,6 +507,8 @@ class FPLteam:
             if (
                 # Check team limit
                 self.player_teams.count(self.fpl.player_stat(name, "team")) > 2
+                # Check managers out
+                or self.fpl.player_stat(name, "position") == "MNG"
                 # Check position limit
                 or self.fpl.player_stat(name, "position") == "GKP"
                 and self.team_positions.count("GKP") == 1
@@ -1598,4 +1600,4 @@ def user_get_password() -> str:
 
 
 if __name__ == "__main__":
-    print("nothing")
+    print(FPLteam().fpl.player_stat("Van Nistelrooy", "position"))

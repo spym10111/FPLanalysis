@@ -284,6 +284,8 @@ def fdr_input() -> list:
     last_gw_number = 9999
 
     while last_gw_number > MAX_GW_NUMBER or first_gw_number < MIN_GW_NUMBER or first_gw_number > last_gw_number:
+        first_gw_number = 9999
+        last_gw_number = 9999
         try:
             print("\nThe program needs to calculate points based on the players' stats and upcoming games."
                   "\nPlease enter the GW period for which you want the points to be calculated.")
@@ -317,4 +319,6 @@ def calculate_fdr(first_gw_number: int, last_gw_number: int) -> list:
 
 
 if __name__ == "__main__":
-    print(FPLstats().player_stat("Robinson", "id_x"))
+    fpl = FPLstats()
+    fpl.calculate_points()
+    print(fpl.player_data)
