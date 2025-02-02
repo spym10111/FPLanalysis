@@ -52,6 +52,8 @@ class FPLstats:
         self.captain_points()
         # Calculating points for transfer comparison
         self.transfer_points(gw_number)
+        # Calculating points for manager comparison
+        self.manager_points()
 
         self.player_data.sort_values(by=["point_calculation", "points_per_game"], ascending=False)
 
@@ -271,6 +273,20 @@ class FPLstats:
                    * factors["point_calculation_factor"]
                    * gw_number
                 )
+        )
+
+    def manager_points(self):
+        """
+        Calculates points for manager comparison.
+
+        :return: None
+        """
+        self.player_data["manager_points"] = (
+            self.player_data["total_points"] ** 3
+            * self.player_data["form"].astype(float)
+            / (
+                self.player_data["fdr_mult"]
+            )
         )
 
 

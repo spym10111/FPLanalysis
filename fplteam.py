@@ -33,15 +33,18 @@ class FPLteam:
         self.team = []
         self.team_positions = []
         self.player_teams = []
+        self.managers = []
         self.points_sum = 0.0
         self.player_points = []
         self.captain_points = []
+        self.manager_points = []
         self.total_budget = 100.0
         self.starters_budget = 0.0
         self.changes_budget = 0.0
         self.bank_budget = 0.0
         self.starters_prices = []
         self.changes_prices = []
+        self.managers_prices = []
         self.unavailable_players_list = []
         self.system = [9999, 9999, 9999]
 
@@ -90,15 +93,18 @@ class FPLteam:
         self.team = []
         self.team_positions = []
         self.player_teams = []
+        self.managers = []
         self.points_sum = 0.0
         self.player_points = []
         self.captain_points = []
+        self.manager_points = []
         self.total_budget = 100.0
         self.starters_budget = 0.0
         self.changes_budget = 0.0
         self.bank_budget = 0.0
         self.starters_prices = []
         self.changes_prices = []
+        self.managers_prices = []
         self.unavailable_players_list = []
         self.system = [9999, 9999, 9999]
 
@@ -113,9 +119,13 @@ class FPLteam:
         print(f"Squad: {self.team}")
         print(f"Potential captains: 1) {self.team[self.captain_points.index(max(self.captain_points))]}"
               f"\t2) {self.team[self.captain_points.index(sorted(self.captain_points)[-2])]}")
+        self.manager_pick()
+        print(f"Potential manager: {self.managers[self.manager_points.index(max(self.manager_points))]}")
+        print(f"Manager price: {self.managers_prices[self.manager_points.index(max(self.manager_points))]}")
         print(f"Total points: {self.points_sum}")
         print(f"Each player's points: {self.player_points}")
         print(f"Captaincy points: {self.captain_points}")
+        print(f"Manager points: {self.manager_points[self.manager_points.index(max(self.manager_points))]}")
 
     def create_new_team(self) -> None:
         """
@@ -1461,6 +1471,20 @@ class FPLteam:
         else:
             return False
 
+    def manager_pick(self):
+        for manager in self.fpl.player_data["name"]:
+            if (
+                self.fpl.player_stat(manager, "position") == "MNG"
+                and self.fpl.player_stat(manager, "cost") <= self.bank_budget
+            ):
+                self.managers.append(manager)
+                self.manager_points.append(self.fpl.player_stat(manager, "manager_points"))
+                self.managers_prices.append(self.fpl.player_stat(manager, "cost"))
+        if len(self.managers) == 0:
+            self.managers.append("-")
+            self.manager_points.append("-")
+            self.managers_prices.append("-")
+
 
 def update_list(updating_list: list, insert_value: str, remove_value: str) -> None:
     """
@@ -1600,4 +1624,4 @@ def user_get_password() -> str:
 
 
 if __name__ == "__main__":
-    print(FPLteam().fpl.player_stat("Van Nistelrooy", "position"))
+    FPLteam().compare_players()
