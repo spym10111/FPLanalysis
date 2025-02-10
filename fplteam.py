@@ -15,15 +15,18 @@ class FPLteam:
         team: List of the players of the team
         team_positions: List of the team's players' positions
         player_teams: List of the team's players' Premier League team
+        managers: List of possible managers
         points_sum: Float of the total points calculated for the team based on the program's formula
         player_points: List of the individual players' calculated points
         captain_points: List of the individual player's calculated points for captaincy
+        manager_points: List of the individual manager's calculated points
         total_budget: Float of the total budget available
         starters_budget: Float of the budget used for the team's starting players
         changes_budget: Float of the budget used for the team's changes
         bank_budget: Float of the budget left in the bank
         starters_prices: List of starting players' prices
-        changes_prices: List of changes' price
+        changes_prices: List of changes' prices
+        managers_prices: List of managers' prices
         unavailable_players_list: List of players excluded from the calculation
         system: List of number of players per position in the team
     """
@@ -1471,7 +1474,12 @@ class FPLteam:
         else:
             return False
 
-    def manager_pick(self):
+    def manager_pick(self) -> None:
+        """
+        Updates the lists for picking a potential manager.
+
+        :return: None
+        """
         for manager in self.fpl.player_data["name"]:
             if (
                 self.fpl.player_stat(manager, "position") == "MNG"

@@ -106,7 +106,7 @@ class FPLapi:
                         gw_count.append(fixtures["event"][fixtures.index[i == fixtures["id"]].tolist()[0]])
             for n in range(1, 39):
                 if n not in gw_count:
-                    team_list.insert(n, np.nan)
+                    team_list.insert(n, 6)
                     gw_count.insert(n - 1, n)
                     for i in fixtures["id"]:
                         if (

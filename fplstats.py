@@ -34,8 +34,8 @@ class FPLstats:
         :return: None
         """
         # Number of GWs to calculate
-        fdr_list = fdr_input()
-        fdr_gw = calculate_fdr(fdr_list[0], fdr_list[1])
+        fdr_range = fdr_input()
+        fdr_gw = calculate_fdr(fdr_range[0], fdr_range[1])
         # Number of GWs the statistics correspond to
         gw_number = fplapi.gw_played()
         # Calculating the FDR part of the function
@@ -133,8 +133,8 @@ class FPLstats:
                 form_factor_list.append(form_factor)
 
                 fdr_factor = (
-                    self.player_stat(duo[0], "fdr_mult")
-                    / self.player_stat(duo[1], "fdr_mult")
+                    self.player_stat(duo[0], "fdr_final")
+                    / self.player_stat(duo[1], "fdr_final")
                 )
                 fdr_factor_list.append(fdr_factor)
         avg_point_calculation_factor = abs(np.average(point_calculation_factor_list))
@@ -158,7 +158,7 @@ class FPLstats:
 
     def fdr_product(self, fdr_gw: list) -> None:
         """
-        Calculates the FDR product part of the calculations.
+        Calculates the FDR part of the function.
 
         :param fdr_gw: A list of the GWs included in the calculations.
         :type fdr_gw: list
@@ -169,15 +169,25 @@ class FPLstats:
             fdr_index.append(self.fdr_data.index[self.fdr_data["team"] == player_team].tolist()[0])
 
         # Calculating FDR as a product
-        mult = []
+        fdr_rows = []
         for gw in fdr_gw:
-            mult.append(self.fdr_data[gw].tolist())
-        self.fdr_data["mult"] = reduce(np.multiply, mult)
+            fdr_rows.append(self.fdr_data[gw].tolist())
+        self.fdr_data["mult"] = reduce(np.multiply, fdr_rows)
+        self.fdr_data["sum"] = [sum(i) for i in zip(*fdr_rows)]
+        self.fdr_data["final"] = self.fdr_data["mult"].div(self.fdr_data["sum"], axis=0).multiply(
+            self.fdr_data["mult"], axis=0)
         self.player_data["fdr_mult"] = ""
+        self.player_data["fdr_sum"] = ""
         fdr_mult_list = self.player_data["fdr_mult"].to_list()
+        fdr_sum_list = self.player_data["fdr_sum"].to_list()
         for i in range(len(fdr_mult_list)):
             fdr_mult_list[i] = self.fdr_data["mult"].to_list()[fdr_index[i]]
+        for i in range(len(fdr_sum_list)):
+            fdr_sum_list[i] = self.fdr_data["sum"].to_list()[fdr_index[i]]
         self.player_data["fdr_mult"] = fdr_mult_list
+        self.player_data["fdr_sum"] = fdr_sum_list
+        self.player_data["fdr_final"] = self.player_data["fdr_mult"].div(self.player_data["fdr_sum"], axis=0).multiply(
+            self.player_data["fdr_mult"], axis=0)
 
     def factor_point_calculation(self) -> None:
         """
@@ -191,7 +201,7 @@ class FPLstats:
                 * self.player_data["points_per_game"].astype(float)
                 * self.player_data["form"].astype(float)
                 * self.player_data["bonus_new"]
-                / self.player_data["fdr_mult"]
+                / self.player_data["fdr_final"]
         )
 
     def point_calculation(self) -> None:
@@ -214,7 +224,7 @@ class FPLstats:
                 * self.player_data["bonus_new"]
                 * factors["bonus_factor"]
                 / (
-                   self.player_data["fdr_mult"]
+                   self.player_data["fdr_final"]
                    * factors["fdr_factor"]
                    * factors["point_calculation_factor"]
                 )
@@ -238,7 +248,7 @@ class FPLstats:
                 * self.player_data["bonus_new"]
                 * factors["bonus_factor"]
                 / (
-                   self.player_data["fdr_mult"]
+                   self.player_data["fdr_final"]
                    * factors["fdr_factor"]
                    * factors["point_calculation_factor"]
                 )
@@ -268,14 +278,14 @@ class FPLstats:
                 )
                 / (
                    self.player_data["cost"]
-                   * self.player_data["fdr_mult"]
+                   * self.player_data["fdr_final"]
                    * factors["fdr_factor"]
                    * factors["point_calculation_factor"]
                    * gw_number
                 )
         )
 
-    def manager_points(self):
+    def manager_points(self) -> None:
         """
         Calculates points for manager comparison.
 
@@ -285,7 +295,7 @@ class FPLstats:
             self.player_data["total_points"] ** 3
             * self.player_data["form"].astype(float)
             / (
-                self.player_data["fdr_mult"]
+                self.player_data["fdr_final"]
             )
         )
 
@@ -337,4 +347,5 @@ def calculate_fdr(first_gw_number: int, last_gw_number: int) -> list:
 if __name__ == "__main__":
     fpl = FPLstats()
     fpl.calculate_points()
+    # print(fpl.fdr_data["gw29"][fpl.fdr_data.index[fpl.fdr_data["team"] == "ARS"].tolist()[0]])
     print(fpl.player_data)

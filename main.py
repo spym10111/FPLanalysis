@@ -132,7 +132,7 @@ def pick_menu_number() -> int:
     return choice
 
 
-def updating_delay():
+def updating_delay() -> None:
     """
     Gives an exit sequence in case the game is updating.
 
