@@ -348,4 +348,4 @@ if __name__ == "__main__":
     fpl = FPLstats()
     fpl.calculate_points()
     # print(fpl.fdr_data["gw29"][fpl.fdr_data.index[fpl.fdr_data["team"] == "ARS"].tolist()[0]])
-    print(fpl.player_data)
+    print(fpl.fdr_data)

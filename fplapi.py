@@ -108,25 +108,26 @@ class FPLapi:
                 if n not in gw_count:
                     team_list.insert(n, 6)
                     gw_count.insert(n - 1, n)
-                    for i in fixtures["id"]:
-                        if (
-                            fixtures["team_a"][fixtures.index[i == fixtures["id"]].tolist()[0]]
-                            == teams["id"][teams.index[team == teams["short_name"]].tolist()[0]]
-                            and pd.isna(fixtures["event"][fixtures.index[i == fixtures["id"]].tolist()[0]])
-                        ):
-                            team_list.pop(n)
-                            team_list.insert(
-                                n, fixtures["team_a_difficulty"][fixtures.index[i == fixtures["id"]].tolist()[0]]
-                            )
-                        elif (
-                              fixtures["team_h"][fixtures.index[i == fixtures["id"]].tolist()[0]]
-                              == teams["id"][teams.index[team == teams["short_name"]].tolist()[0]]
-                              and pd.isna(fixtures["event"][fixtures.index[i == fixtures["id"]].tolist()[0]])
-                        ):
-                            team_list.pop(n)
-                            team_list.insert(
-                                n, fixtures["team_h_difficulty"][fixtures.index[i == fixtures["id"]].tolist()[0]]
-                            )
+                    # Temporary comment of code that might be useful in future bug (predictions were made...)
+                    # for i in fixtures["id"]:
+                    #     if (
+                    #         fixtures["team_a"][fixtures.index[i == fixtures["id"]].tolist()[0]]
+                    #         == teams["id"][teams.index[team == teams["short_name"]].tolist()[0]]
+                    #         and pd.isna(fixtures["event"][fixtures.index[i == fixtures["id"]].tolist()[0]])
+                    #     ):
+                    #         team_list.pop(n)
+                    #         team_list.insert(
+                    #             n, fixtures["team_a_difficulty"][fixtures.index[i == fixtures["id"]].tolist()[0]]
+                    #         )
+                    #     elif (
+                    #           fixtures["team_h"][fixtures.index[i == fixtures["id"]].tolist()[0]]
+                    #           == teams["id"][teams.index[team == teams["short_name"]].tolist()[0]]
+                    #           and pd.isna(fixtures["event"][fixtures.index[i == fixtures["id"]].tolist()[0]])
+                    #     ):
+                    #         team_list.pop(n)
+                    #         team_list.insert(
+                    #             n, fixtures["team_h_difficulty"][fixtures.index[i == fixtures["id"]].tolist()[0]]
+                    #         )
             data.append(team_list)
         self.fixtures_df = pd.DataFrame(data, columns=column_names)
         return self.fixtures_df
