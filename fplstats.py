@@ -168,26 +168,35 @@ class FPLstats:
         for player_team in self.player_data["team"]:
             fdr_index.append(self.fdr_data.index[self.fdr_data["team"] == player_team].tolist()[0])
 
-        # Calculating FDR as a product
+        # Calculating FDR for multiple GWs
         fdr_rows = []
+        fdr_final = 0
+        fdr_final_list = []
+        fdr_final_list_calc = []
         for gw in fdr_gw:
             fdr_rows.append(self.fdr_data[gw].tolist())
-        self.fdr_data["mult"] = reduce(np.multiply, fdr_rows)
-        self.fdr_data["sum"] = [sum(i) for i in zip(*fdr_rows)]
-        self.fdr_data["final"] = self.fdr_data["mult"].div(self.fdr_data["sum"], axis=0).multiply(
-            self.fdr_data["mult"], axis=0)
-        self.player_data["fdr_mult"] = ""
-        self.player_data["fdr_sum"] = ""
-        fdr_mult_list = self.player_data["fdr_mult"].to_list()
-        fdr_sum_list = self.player_data["fdr_sum"].to_list()
-        for i in range(len(fdr_mult_list)):
-            fdr_mult_list[i] = self.fdr_data["mult"].to_list()[fdr_index[i]]
-        for i in range(len(fdr_sum_list)):
-            fdr_sum_list[i] = self.fdr_data["sum"].to_list()[fdr_index[i]]
-        self.player_data["fdr_mult"] = fdr_mult_list
-        self.player_data["fdr_sum"] = fdr_sum_list
-        self.player_data["fdr_final"] = self.player_data["fdr_mult"].div(self.player_data["fdr_sum"], axis=0).multiply(
-            self.player_data["fdr_mult"], axis=0)
+        if len(fdr_rows) == 1:
+            fdr_final_list_calc = fdr_rows[0]
+        else:
+            for i in range(20):
+                fdr_final_sublist = []
+                for row in fdr_rows:
+                    fdr_final_sublist.append(row[0])
+                    row.pop(0)
+                fdr_final_list.append(fdr_final_sublist)
+            for team_fdr in fdr_final_list:
+                for fdr_value in team_fdr:
+                    if fdr_value == team_fdr[0]:
+                        fdr_final = team_fdr[0]
+                    else:
+                        fdr_final = fdr_final * fdr_value / (fdr_final + fdr_value)
+                fdr_final_list_calc.append(fdr_final)
+        self.fdr_data["final"] = fdr_final_list_calc
+        self.player_data["fdr_final"] = ""
+        new_fdr_final_list = self.player_data["fdr_final"].to_list()
+        for i in range(len(new_fdr_final_list)):
+            new_fdr_final_list[i] = self.fdr_data["final"].to_list()[fdr_index[i]]
+        self.player_data["fdr_final"] = new_fdr_final_list
 
     def factor_point_calculation(self) -> None:
         """
@@ -349,4 +358,3 @@ if __name__ == "__main__":
     fpl.calculate_points()
     # print(fpl.fdr_data["gw29"][fpl.fdr_data.index[fpl.fdr_data["team"] == "ARS"].tolist()[0]])
     print(fpl.fdr_data)
-wesefsdfds
