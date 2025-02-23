@@ -1,5 +1,5 @@
 import numpy as np
-from functools import reduce, cache
+from functools import cache
 
 import fplapi
 from fplapi import FPLapi
@@ -73,89 +73,6 @@ class FPLstats:
             [self.player_data.index[self.player_data["name"] == player_name].tolist()[0]]
         )
 
-    def calculation_factors(self) -> None:
-        """
-        Used to calculate the point formula factors for every value. Creates a .json file with the values.
-
-        :return: None
-        """
-        player_list = []
-        for name in self.player_data["name"]:
-            player_list.append(name)
-
-        point_calculation_factor_list = []
-        total_points_factor_list = []
-        points_per_game_factor_list = []
-        value_factor_list = []
-        bonus_factor_list = []
-        form_factor_list = []
-        fdr_factor_list = []
-
-        for duo in combinations(player_list, 2):
-            if (
-                self.player_stat(duo[0], "factor_point_calculation") != 0
-                and self.player_stat(duo[1], "factor_point_calculation") != 0
-            ):
-                point_calculation_factor = (
-                    self.player_stat(duo[0], "factor_point_calculation")
-                    / self.player_stat(duo[1], "factor_point_calculation")
-                )
-                point_calculation_factor_list.append(point_calculation_factor)
-
-                total_points_factor = (
-                    self.player_stat(duo[0], "total_points")
-                    / self.player_stat(duo[1], "total_points")
-                )
-                total_points_factor_list.append(total_points_factor)
-
-                points_per_game_factor = (
-                    float(self.player_stat(duo[0], "points_per_game"))
-                    / float(self.player_stat(duo[1], "points_per_game"))
-                )
-                points_per_game_factor_list.append(points_per_game_factor)
-
-                value_factor = (
-                    float(self.player_stat(duo[0], "value_season"))
-                    / float(self.player_stat(duo[1], "value_season"))
-                )
-                value_factor_list.append(value_factor)
-
-                bonus_factor = (
-                    self.player_stat(duo[0], "bonus_new")
-                    / self.player_stat(duo[1], "bonus_new")
-                )
-                bonus_factor_list.append(bonus_factor)
-
-                form_factor = (
-                    float(self.player_stat(duo[0], "form"))
-                    / float(self.player_stat(duo[1], "form"))
-                )
-                form_factor_list.append(form_factor)
-
-                fdr_factor = (
-                    self.player_stat(duo[0], "fdr_final")
-                    / self.player_stat(duo[1], "fdr_final")
-                )
-                fdr_factor_list.append(fdr_factor)
-        avg_point_calculation_factor = abs(np.average(point_calculation_factor_list))
-        avg_total_points_factor = abs(np.average(total_points_factor_list))
-        avg_points_per_game_factor = abs(np.average(points_per_game_factor_list))
-        avg_value_factor = abs(np.average(value_factor_list))
-        avg_bonus_factor = abs(np.average(bonus_factor_list))
-        avg_form_factor = abs(np.average(form_factor_list))
-        avg_fdr_factor = abs(np.average(fdr_factor_list))
-        factor_dict = {
-            "point_calculation_factor": avg_point_calculation_factor,
-            "total_points_factor": avg_total_points_factor,
-            "points_per_game_factor": avg_points_per_game_factor,
-            "value_factor": avg_value_factor,
-            "bonus_factor": avg_bonus_factor,
-            "form_factor": avg_form_factor,
-            "fdr_factor": avg_fdr_factor,
-        }
-        with open("factors.json", "w") as file:
-            json.dump(factor_dict, file, indent=4)
-
     def fdr_product(self, fdr_gw: list) -> None:
         """
         Calculates the FDR part of the function.
@@ -185,18 +102,106 @@ class FPLstats:
                     row.pop(0)
                 fdr_final_list.append(fdr_final_sublist)
             for team_fdr in fdr_final_list:
+                i = 0
                 for fdr_value in team_fdr:
-                    if fdr_value == team_fdr[0]:
+                    if np.isnan(fdr_value):
+                        continue
+                    if i == 0 and not np.isnan(fdr_value):
                         fdr_final = team_fdr[0]
                     else:
                         fdr_final = fdr_final * fdr_value / (fdr_final + fdr_value)
+                    i += 1
                 fdr_final_list_calc.append(fdr_final)
+                fdr_final = 0
         self.fdr_data["final"] = fdr_final_list_calc
         self.player_data["fdr_final"] = ""
         new_fdr_final_list = self.player_data["fdr_final"].to_list()
         for i in range(len(new_fdr_final_list)):
             new_fdr_final_list[i] = self.fdr_data["final"].to_list()[fdr_index[i]]
         self.player_data["fdr_final"] = new_fdr_final_list
+
+    def calculation_factors(self) -> None:
+        """
+        Used to calculate the point formula factors for every value. Creates a .json file with the values.
+
+        :return: None
+        """
+        player_list = []
+        for name in self.player_data["name"]:
+            player_list.append(name)
+
+        point_calculation_factor_list = []
+        total_points_factor_list = []
+        points_per_game_factor_list = []
+        value_factor_list = []
+        bonus_factor_list = []
+        form_factor_list = []
+        fdr_factor_list = []
+
+        for duo in combinations(player_list, 2):
+            if (
+                self.player_stat(duo[0], "factor_point_calculation") != 0
+                and self.player_stat(duo[1], "factor_point_calculation") != 0
+            ):
+                point_calculation_factor = (
+                    float(self.player_stat(duo[0], "factor_point_calculation"))
+                    / float(self.player_stat(duo[1], "factor_point_calculation"))
+                )
+                point_calculation_factor_list.append(point_calculation_factor)
+
+                total_points_factor = (
+                    float(self.player_stat(duo[0], "total_points"))
+                    / float(self.player_stat(duo[1], "total_points"))
+                )
+                total_points_factor_list.append(total_points_factor)
+
+                points_per_game_factor = (
+                    float(self.player_stat(duo[0], "points_per_game"))
+                    / float(self.player_stat(duo[1], "points_per_game"))
+                )
+                points_per_game_factor_list.append(points_per_game_factor)
+
+                value_factor = (
+                    float(self.player_stat(duo[0], "value_season"))
+                    / float(self.player_stat(duo[1], "value_season"))
+                )
+                value_factor_list.append(value_factor)
+
+                bonus_factor = (
+                    float(self.player_stat(duo[0], "bonus_new"))
+                    / float(self.player_stat(duo[1], "bonus_new"))
+                )
+                bonus_factor_list.append(bonus_factor)
+
+                form_factor = (
+                    float(self.player_stat(duo[0], "form"))
+                    / float(self.player_stat(duo[1], "form"))
+                )
+                form_factor_list.append(form_factor)
+
+                fdr_factor = (
+                    float(self.player_stat(duo[0], "fdr_final"))
+                    / float(self.player_stat(duo[1], "fdr_final"))
+                )
+                fdr_factor_list.append(fdr_factor)
+        avg_point_calculation_factor = abs(np.average(point_calculation_factor_list))
+        avg_total_points_factor = abs(np.average(total_points_factor_list))
+        avg_points_per_game_factor = abs(np.average(points_per_game_factor_list))
+        avg_value_factor = abs(np.average(value_factor_list))
+        avg_bonus_factor = abs(np.average(bonus_factor_list))
+        avg_form_factor = abs(np.average(form_factor_list))
+        avg_fdr_factor = abs(np.average(fdr_factor_list))
+        factor_dict = {
+            "point_calculation_factor": avg_point_calculation_factor,
+            "total_points_factor": avg_total_points_factor,
+            "points_per_game_factor": avg_points_per_game_factor,
+            "value_factor": avg_value_factor,
+            "bonus_factor": avg_bonus_factor,
+            "form_factor": avg_form_factor,
+            "fdr_factor": avg_fdr_factor,
+        }
+        with open("factors.json", "w") as file:
+            json.dump(factor_dict, file, indent=4)
 
     def factor_point_calculation(self) -> None:
         """
@@ -205,12 +210,12 @@ class FPLstats:
         :return: None
         """
         self.player_data["factor_point_calculation"] = (
-                self.player_data["total_points"]
+                self.player_data["total_points"].astype(float)
                 * self.player_data["value_season"].astype(float)
                 * self.player_data["points_per_game"].astype(float)
                 * self.player_data["form"].astype(float)
-                * self.player_data["bonus_new"]
-                / self.player_data["fdr_final"]
+                * self.player_data["bonus_new"].astype(float)
+                / self.player_data["fdr_final"].astype(float)
         )
 
     def point_calculation(self) -> None:
