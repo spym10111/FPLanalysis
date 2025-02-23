@@ -94,6 +94,9 @@ class FPLstats:
             fdr_rows.append(self.fdr_data[gw].tolist())
         if len(fdr_rows) == 1:
             fdr_final_list_calc = fdr_rows[0]
+            for fdr_value in fdr_final_list_calc:
+                if np.isnan(fdr_value):
+                    fdr_final_list_calc[fdr_final_list_calc.index(fdr_value)] = 9999
         else:
             for i in range(20):
                 fdr_final_sublist = []
