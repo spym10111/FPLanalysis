@@ -110,7 +110,7 @@ class FPLstats:
                     if np.isnan(fdr_value):
                         continue
                     if i == 0 and not np.isnan(fdr_value):
-                        fdr_final = team_fdr[0]
+                        fdr_final = fdr_value
                     else:
                         fdr_final = fdr_final * fdr_value / (fdr_final + fdr_value)
                     i += 1

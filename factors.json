@@ -1,9 +1,9 @@
 {
-    "point_calculation_factor": 24508211.495514005,
-    "total_points_factor": 3.5816693854279036,
-    "points_per_game_factor": 1.385760314074758,
-    "value_factor": 3.18312015342975,
-    "bonus_factor": 2.7894006285035893,
-    "form_factor": 2.816894051650595,
-    "fdr_factor": 814.9597211671764
+    "point_calculation_factor": 99393.50699106931,
+    "total_points_factor": 3.391285293839508,
+    "points_per_game_factor": 1.3749497511026698,
+    "value_factor": 2.9801482255828,
+    "bonus_factor": 2.7734371293827844,
+    "form_factor": 2.532178903809959,
+    "fdr_factor": 1.0218906105555983
 }
