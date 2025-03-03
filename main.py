@@ -11,7 +11,7 @@ def menu() -> None:
 
     :return: None
     """
-    print("\n\n--------------------------------------Log in--------------------------------------"
+    print("\n\n---------------------------------------Login--------------------------------------"
           "-----------------")
     choice = 0
     credentials = []
@@ -37,6 +37,8 @@ def menu() -> None:
         print("")
         if choice == 1:
             try:
+                print("\n\n-----------------------------------Official Team----------------------------------"
+                      "-----------------")
                 fplteam = FPLteam()
                 try:
                     # Using log-in information
@@ -52,6 +54,8 @@ def menu() -> None:
                 break
         elif choice == 2:
             try:
+                print("\n\n----------------------------------New Team (Auto)---------------------------------"
+                      "-----------------")
                 fplteam = FPLteam()
                 try:
                     # Creating the best team without any inputs
@@ -66,6 +70,8 @@ def menu() -> None:
                 break
         elif choice == 3:
             try:
+                print("\n\n---------------------------------New Team (Manual)--------------------------------"
+                      "-----------------")
                 fplteam = FPLteam()
                 try:
                     # Creating a new team by entering names
@@ -81,6 +87,8 @@ def menu() -> None:
                 break
         elif choice == 4:
             try:
+                print("\n\n------------------------------------Saved Team------------------------------------"
+                      "-----------------")
                 fplteam = FPLteam()
                 try:
                     # Using a previously saved team
@@ -100,6 +108,8 @@ def menu() -> None:
                 break
         elif choice == 5:
             try:
+                print("\n\n--------------------------------Player Comparison---------------------------------"
+                      "-----------------")
                 fplteam = FPLteam()
                 try:
                     # Comparing players' captaincy points
@@ -112,12 +122,16 @@ def menu() -> None:
                 break
         elif choice == 6:
             try:
+                print("\n\n---------------------------------------Login--------------------------------------"
+                      "-----------------")
                 credentials = log_in()
             except NotImplementedError:
                 updating_delay()
                 break
         elif choice == 7:
             # Exits the program
+            print("\n\n---------------------------------------Exit---------------------------------------"
+                  "-----------------")
             print("\nThank you for using FPL Analysis.")
             time.sleep(1)
             print("3...")
@@ -137,10 +151,10 @@ def pick_menu_number() -> int:
     :return: int
     """
     choice = ""
-    while choice not in [1, 2, 3, 4, 5, 6]:
+    while choice not in [1, 2, 3, 4, 5, 6, 7]:
         try:
             choice = int(input("\n\nEnter number: "))
-            if choice not in [1, 2, 3, 4, 5, 6]:
+            if choice not in [1, 2, 3, 4, 5, 6, 7]:
                 print("\nInvalid number.")
         except ValueError:
             print("\nInvalid number.")
@@ -175,6 +189,7 @@ def log_in() -> list:
 
     :return: A list of the username and password of the input
     """
+    print("\nPlease enter your official FPL credentials.")
     log_in_info = []
     status_raise = True
     while status_raise:
@@ -197,7 +212,7 @@ def user_get_username() -> str:
 
     :return: A string of the user's username
     """
-    username = input("\nPlease enter your e-mail (or type 'cancel' to go back): ")
+    username = input("\nE-mail: ")
     return username
 
 
@@ -207,7 +222,7 @@ def user_get_password() -> str:
 
     :return: A string of the user's password
     """
-    password = getpass("\nPlease enter your password (or type 'cancel' to go back): ")
+    password = getpass("\nPassword: ")
     return password
 
 

@@ -312,11 +312,13 @@ class FPLteam:
         continue_updating = ""
         while continue_updating.lower() != "skip":
             continue_updating = input("\nDo you want to exclude any players or get suggestion "
-                                      "(exclude/suggestion/skip)? ")
+                                      "(exclude/suggestion/skip/cancel)? ")
             if continue_updating.lower() == "exclude":
                 break
             elif continue_updating.lower() == "skip":
                 return None
+            elif continue_updating.lower() == "cancel":
+                raise ValueError
             elif continue_updating.lower() == "suggestion":
                 self.transfer_calculation()
             else:
@@ -330,15 +332,18 @@ class FPLteam:
                 and unavailable_player.lower() != "all"
                 and unavailable_player.lower() != "update"
                 and unavailable_player.lower() != "suggestion"
+                and unavailable_player.lower() != "cancel"
         ):
             invalid_check.clear()
             unavailable_player = input("\nAdd players to the exclusion list "
-                                       "(player/suggestion/all/update/none/stop): ")
+                                       "(player/suggestion/all/none/update/stop/cancel): ")
             if unavailable_player.lower() == "stop":
                 break
             if unavailable_player.lower() == "none":
                 self.unavailable_players_list = []
                 break
+            if unavailable_player.lower() == "cancel":
+                raise ValueError
             for player in self.team:
                 if unavailable_player.lower() == "all" and player not in self.unavailable_players_list:
                     self.unavailable_players_list.append(player)
@@ -387,9 +392,13 @@ class FPLteam:
                     return None
                 elif unavailable_player.lower() == "stop":
                     changes_choice = ""
-                    while changes_choice.lower() != "replace" and changes_choice.lower() != "update":
+                    while (
+                           changes_choice.lower() != "replace"
+                           and changes_choice.lower() != "update"
+                           and changes_choice.lower() != "cancel"
+                    ):
                         changes_choice = input("\nDo you want to find replacements "
-                                               "or update the entire team (replace/update)? ")
+                                               "or update the entire team (replace/update/cancel)? ")
                         if changes_choice.lower() == "replace":
                             self.change_players()
                             self.transfer_players()
@@ -398,6 +407,8 @@ class FPLteam:
                             self.update_team()
                             self.transfer_players()
                             return None
+                        elif changes_choice.lower() == "cancel":
+                            raise ValueError
                         else:
                             print("\nInvalid answer.")
             elif 1 in player_not_in_team:
@@ -414,14 +425,24 @@ class FPLteam:
         self.transfer_single_loop()
 
         extended_suggestion = ""
-        while extended_suggestion.lower() != "yes" and extended_suggestion.lower() != "no":
+        while (
+               extended_suggestion.lower() != "yes"
+               and extended_suggestion.lower() != "no"
+               and extended_suggestion.lower() != "cancel"
+        ):
             extended_suggestion = input("\nWould you like to run the extended suggestion "
-                                        "for double player changes (yes/no)? ")
-            if extended_suggestion.lower() != "yes" and extended_suggestion.lower() != "no":
+                                        "for double player changes (yes/no/cancel)? ")
+            if (
+                extended_suggestion.lower() != "yes"
+                and extended_suggestion.lower() != "no"
+                and extended_suggestion.lower() != "cancel"
+            ):
                 print("\nInvalid answer.")
             if extended_suggestion.lower() == "yes":
                 # Calculation for double transfer
                 self.transfer_double_loop()
+            if extended_suggestion.lower() == "cancel":
+                raise ValueError
 
     def choose_system(self) -> None:
         """
@@ -599,24 +620,38 @@ class FPLteam:
 
         changes_budget = ""
         type_error = True
+        cancel_value_changes = False
         if budget_choice.lower() == "yes":
             while type_error:
                 try:
-                    changes_budget = float(input("Enter your changes' budget: "))
+                    changes_budget_str = input("Enter your changes' budget: ")
+                    if changes_budget_str.lower() == "cancel":
+                        cancel_value_changes = True
+                        break
+                    changes_budget = float(changes_budget_str)
                     type_error = False
                 except ValueError:
                     print("\nInvalid budget.")
+            if cancel_value_changes:
+                raise ValueError
             self.changes_budget = changes_budget
 
         bank_budget = ""
         type_error = True
+        cancel_value_bank = False
         if budget_choice.lower() == "yes":
             while type_error:
                 try:
-                    bank_budget = float(input("Enter your budget in the bank: "))
+                    bank_budget_str = input("Enter your budget in the bank: ")
+                    if bank_budget_str.lower() == "cancel":
+                        cancel_value_bank = True
+                        break
+                    bank_budget = float(bank_budget_str)
                     type_error = False
                 except ValueError:
                     print("\nInvalid budget.")
+            if cancel_value_bank:
+                raise ValueError
             self.bank_budget = bank_budget
 
         if budget_choice.lower() == "yes":
