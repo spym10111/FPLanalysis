@@ -1480,6 +1480,9 @@ class FPLteam:
 
         :return: None
         """
+        self.managers = []
+        self.manager_points = []
+        self.managers_prices = []
         for manager in self.fpl.player_data["name"]:
             if (
                 self.fpl.player_stat(manager, "position") == "MNG"
