@@ -8,7 +8,7 @@ from getpass import getpass
 
 class FPLteam:
     """
-    Holds the methods for creating and updating the FPL team.
+    Holds the methods for creating and updating the FPL team
 
     Attributes:
         fpl: Calls the FPLstats class for using player stats and calculating points
@@ -55,7 +55,7 @@ class FPLteam:
 
     def add_player(self, player: str) -> None:
         """
-        Adds a player's statistics to the team lists.
+        Adds a player's statistics to the team lists
 
         :param player: Name of the player
         :type player: str
@@ -72,7 +72,7 @@ class FPLteam:
 
     def remove_player(self, player: str) -> None:
         """
-        Removes a player's statistics from the lists.
+        Removes a player's statistics from the lists
 
         :param player: Name of the player
         :type player: str
@@ -89,7 +89,7 @@ class FPLteam:
 
     def reset_info(self) -> None:
         """
-        Resets the starting values of the team class.
+        Resets the starting values of the team class
 
         :return: None
         """
@@ -113,7 +113,7 @@ class FPLteam:
 
     def print_result(self) -> None:
         """
-        Prints the results of a calculation in a preferred format.
+        Prints the results of a calculation in a preferred format
 
         :return: None
         """
@@ -132,7 +132,7 @@ class FPLteam:
 
     def create_new_team(self) -> None:
         """
-        Calculates a new team without any inputs.
+        Calculates a new team without any inputs
 
         :return: None
         """
@@ -145,7 +145,7 @@ class FPLteam:
 
     def enter_new_team(self) -> None:
         """
-        Accepts player names and prices in order to create a new team.
+        Accepts player names and prices in order to create a new team
 
         :return: None
         """
@@ -162,7 +162,7 @@ class FPLteam:
 
     def open_saved_team(self) -> None:
         """
-        Opens a previously saved team.
+        Opens a previously saved team
 
         :return: None
         """
@@ -176,30 +176,24 @@ class FPLteam:
             self.saved_loop_players(saved_team, username)
             self.saved_budget_changes(saved_team, username)
 
-    def open_user_team(self) -> None:
+    def open_user_team(self, username: str, password: str) -> None:
         """
-        Opens a new team based on a user's official Fantasy Premier League log-in information.
+        Opens a new team based on a user's official Fantasy Premier League log-in information
 
+        :param username: E-mail used for request on the FPL API
+        :type username: str
+        :param password: Password used for request on the FPL API
+        :type password: str
         :return: None
         """
         self.reset_info()
 
-        status_raise = True
-        while status_raise:
-            try:
-                username = user_get_username()
-                password = user_get_password()
-
-                self.user_team_players(username, password)
-                self.user_budget_changes(username, password)
-
-                status_raise = False
-            except TypeError:
-                print("\nInvalid e-mail or password.")
+        self.user_team_players(username, password)
+        self.user_budget_changes(username, password)
 
     def compare_players(self) -> None:
         """
-        Used for comparing players based on their captaincy points (cost value is not included).
+        Used for comparing players based on their captaincy points (cost value is not included)
 
         :return: None
         """
@@ -239,7 +233,7 @@ class FPLteam:
 
     def change_players(self) -> None:
         """
-        Function for replacing players if excluded.
+        Function for replacing players if excluded
 
         :return: None
         """
@@ -286,7 +280,7 @@ class FPLteam:
 
     def update_team(self) -> None:
         """
-        Updates the entire FPL team.
+        Updates the entire FPL team
 
         :return: None
         """
@@ -311,7 +305,7 @@ class FPLteam:
 
     def transfer_players(self) -> None:
         """
-        Used for transferring players and hold information on player availability.
+        Used for transferring players and hold information on player availability
 
         :return: None
         """
@@ -412,7 +406,7 @@ class FPLteam:
 
     def transfer_calculation(self) -> None:
         """
-        Calculates whether an extra player transfer is worth the -4 points and gives a list of suggestions.
+        Calculates whether an extra player transfer is worth the -4 points and gives a list of suggestions
 
         :return: None
         """
@@ -431,7 +425,7 @@ class FPLteam:
 
     def choose_system(self) -> None:
         """
-        Holds information on the team's system.
+        Holds information on the team's system
 
         :return: None
         """
@@ -475,7 +469,7 @@ class FPLteam:
 
     def save_team(self) -> None:
         """
-        Saves the team for future use.
+        Saves the team for future use
 
         :return: None
         """
@@ -512,7 +506,7 @@ class FPLteam:
 
     def create_loop_players(self) -> None:
         """
-        Loops through the player database to create a team in the create_new_team method.
+        Loops through the player database to create a team in the create_new_team method
 
         :return: None
         """
@@ -539,13 +533,13 @@ class FPLteam:
     def enter_loop_players(self, team_player: str, budget_choice: str, player_price: float) -> None:
         """
         Loops through the player database in search of the player name given and add him to the team
-        (used in the enter_new_team method).
+        (used in the enter_new_team method)
 
-        :param team_player: Name of the player the method searches for.
+        :param team_player: Name of the player the method searches for
         :type team_player: str
-        :param budget_choice: Choice of whether to enter budget information or not ('yes' or 'no').
+        :param budget_choice: Choice of whether to enter budget information or not ('yes' or 'no')
         :type budget_choice: str
-        :param player_price: Price of the player the method searches for.
+        :param player_price: Price of the player the method searches for
         :type player_price: float
         :return: None
         """
@@ -591,9 +585,9 @@ class FPLteam:
 
     def enter_budget_changes(self, budget_choice: str) -> None:
         """
-        Changes the budget values if used (in the enter_new_team method).
+        Changes the budget values if used (in the enter_new_team method)
 
-        :param budget_choice: Choice of whether to enter budget information or not ('yes' or 'no').
+        :param budget_choice: Choice of whether to enter budget information or not ('yes' or 'no')
         :type budget_choice: str
         :return: None
         """
@@ -631,11 +625,11 @@ class FPLteam:
     def saved_loop_players(self, saved_team: dict, username: str) -> None:
         """
         Loops through the player database in search of the players in the saved team file and updates the team
-        (used in the open_saved_team method).
+        (used in the open_saved_team method)
 
-        :param saved_team: Dictionary of the saved team taken from the .json file.
+        :param saved_team: Dictionary of the saved team taken from the .json file
         :type saved_team: dict
-        :param username: The user's username.
+        :param username: The user's username
         :type username: str
         :return:
         """
@@ -654,11 +648,11 @@ class FPLteam:
 
     def saved_budget_changes(self, saved_team: dict, username: str) -> None:
         """
-        Changes the budget values in the open_saved_team method.
+        Changes the budget values in the open_saved_team method
 
-        :param saved_team: Dictionary of the saved team taken from the .json file.
+        :param saved_team: Dictionary of the saved team taken from the .json file
         :type saved_team: dict
-        :param username: The user's username.
+        :param username: The user's username
         :type username: str
         :return: None
         """
@@ -672,11 +666,11 @@ class FPLteam:
     def user_team_players(self, username: str, password: str) -> None:
         """
         Gets the user's team from the official FPL API using his log-in information
-        (used in the open_user_team method).
+        (used in the open_user_team method)
 
-        :param username: The user's username.
+        :param username: The user's username
         :type username: str
-        :param password: The user's password.
+        :param password: The user's password
         :type password: str
         :return: None
         """
@@ -694,11 +688,11 @@ class FPLteam:
 
     def user_budget_changes(self, username: str, password: str) -> None:
         """
-        Changes the budget values in the open_user_team method.
+        Changes the budget values in the open_user_team method
 
-        :param username: The user's username from his official FPL account.
+        :param username: The user's username from his official FPL account
         :type username: str
-        :param password: The user's password from his official FPL account.
+        :param password: The user's password from his official FPL account
         :type password: str
         :return: None
         """
@@ -711,9 +705,9 @@ class FPLteam:
 
     def pl_all_teams(self) -> list:
         """
-        Creates a list of all the premier league teams.
+        Creates a list of all the premier league teams
 
-        :return: A list of all the premier league teams.
+        :return: A list of all the premier league teams
         """
         all_teams = []
         for team in self.fpl.player_data["team"]:
@@ -724,11 +718,11 @@ class FPLteam:
     def retry_players(self, all_teams: list, used_players: list) -> None:
         """
         Makes the player available for the team again if his premier league team doesn't appear more than 2 times in
-        the players' teams count according to the FPL rules.
+        the players' teams count according to the FPL rules
 
-        :param all_teams: A list of all the premier league teams.
+        :param all_teams: A list of all the premier league teams
         :type all_teams: list
-        :param used_players: A list of the players already used in the loops.
+        :param used_players: A list of the players already used in the loops
         :type used_players: list
         :return: None
         """
@@ -743,19 +737,19 @@ class FPLteam:
             temp_teams: list, temp_teams_change: list
     ) -> None:
         """
-        First loop through players in the change_players method. Just replacing the original changing players.
+        First loop through players in the change_players method (Just replacing the original changing players)
 
-        :param used_players: A list of the players already used in the loops.
+        :param used_players: A list of the players already used in the loops
         :type used_players: list
-        :param changing_players: A list of the players in the process of changing.
+        :param changing_players: A list of the players in the process of changing
         :type changing_players: list
-        :param team_player: A player from the changing_players list.
+        :param team_player: A player from the changing_players list
         :type team_player: str
-        :param max_budget: A list containing the maximum budget for the player change.
+        :param max_budget: A list containing the maximum budget for the player change
         :type max_budget: list
-        :param temp_teams: A list of the team's players' premier league teams.
+        :param temp_teams: A list of the team's players' premier league teams
         :type temp_teams: list
-        :param temp_teams_change: A list of the changing players' premier league teams.
+        :param temp_teams_change: A list of the changing players' premier league teams
         :type temp_teams_change: list
         :return: None
         """
@@ -812,19 +806,19 @@ class FPLteam:
             temp_teams: list, temp_teams_change: list
     ) -> None:
         """
-        Loops after the first loop through players in the change_players method.
+        Loops after the first loop through players in the change_players method
 
-        :param used_players: A list of the players already used in the loops.
+        :param used_players: A list of the players already used in the loops
         :type used_players: list
-        :param changing_players: A list of the players in the process of changing.
+        :param changing_players: A list of the players in the process of changing
         :type changing_players: list
-        :param team_player: A player from the changing_players list.
+        :param team_player: A player from the changing_players list
         :type team_player: str
-        :param max_budget: A list containing the maximum budget for the player change.
+        :param max_budget: A list containing the maximum budget for the player change
         :type max_budget: list
-        :param temp_teams: A list of the team's players' premier league teams.
+        :param temp_teams: A list of the team's players' premier league teams
         :type temp_teams: list
-        :param temp_teams_change: A list of the changing players' premier league teams.
+        :param temp_teams_change: A list of the changing players' premier league teams
         :type temp_teams_change: list
         :return: None
         """
@@ -918,13 +912,13 @@ class FPLteam:
 
     def update_team_first_loop(self, used_players: list, team_player: str, max_budget: float) -> None:
         """
-        First loop through players in the update_team method. Just replacing the original players.
+        First loop through players in the update_team method (Just replacing the original players)
 
-        :param used_players: A list of the players already used in the loops.
+        :param used_players: A list of the players already used in the loops
         :type used_players: list
-        :param team_player: A player from the team list.
+        :param team_player: A player from the team list
         :type team_player: str
-        :param max_budget: A float of the maximum budget for the team.
+        :param max_budget: A float of the maximum budget for the team
         :type max_budget: float
         :return: None
         """
@@ -954,13 +948,13 @@ class FPLteam:
 
     def update_team_more_loops(self, used_players: list, team_player: str, max_budget: float) -> None:
         """
-        Loops after the first loop through players in the update_team method.
+        Loops after the first loop through players in the update_team method
 
-        :param used_players: A list of the players already used in the loops.
+        :param used_players: A list of the players already used in the loops
         :type used_players: list
-        :param team_player: A player from the team list.
+        :param team_player: A player from the team list
         :type team_player: str
-        :param max_budget: A float of the maximum budget for the team.
+        :param max_budget: A float of the maximum budget for the team
         :type max_budget: float
         :return: None
         """
@@ -1033,7 +1027,7 @@ class FPLteam:
 
     def transfer_single_loop(self) -> None:
         """
-        Single transfer suggestion loop.
+        Single transfer suggestion loop
 
         :return: None
         """
@@ -1097,23 +1091,23 @@ class FPLteam:
     def transfer_double_first_loop(self, used_players: list, possible_transfers: dict, key: int, team_player: str,
                                    max_budget: list, teams: list, teams_transfer: list) -> None:
         """
-        Double transfer suggestion first loop through players.
-        Just replacing the original players of the possible transfer.
+        Double transfer suggestion first loop through players
+        (Just replacing the original players of the possible transfer)
 
-        :param used_players: A list of the players already used in the loops.
+        :param used_players: A list of the players already used in the loops
         :type used_players: list
-        :param possible_transfers: A dictionary of the possible double transfer combinations.
+        :param possible_transfers: A dictionary of the possible double transfer combinations
         :type possible_transfers: dict
-        :param key: The key of the possible_transfers dictionary.
+        :param key: The key of the possible_transfers dictionary
         :type key: int
-        :param team_player: A player from the team list.
+        :param team_player: A player from the team list
         :type team_player: str
-        :param max_budget: A list of the possible max budgets.
+        :param max_budget: A list of the possible max budgets
         :type max_budget: list
         :param teams: A list of the premier league teams of the players in the team, which updates while transfer
-        calculations are taking place.
+        calculations are taking place
         :type teams: list
-        :param teams_transfer: A list of the premier league teams of the players in the possible_transfers dictionary.
+        :param teams_transfer: A list of the premier league teams of the players in the possible_transfers dictionary
         :type teams_transfer: list
         :return: None
         """
@@ -1168,22 +1162,22 @@ class FPLteam:
     def transfer_double_more_loops(self, used_players: list, possible_transfers: dict, key: int, team_player: str,
                                    max_budget: list, teams: list, teams_transfer: list) -> None:
         """
-        Double transfer suggestion loops after the first loop through players.
+        Double transfer suggestion loops after the first loop through players
 
-        :param used_players: A list of the players already used in the loops.
+        :param used_players: A list of the players already used in the loops
         :type used_players: list
-        :param possible_transfers: A dictionary of the possible double transfer combinations.
+        :param possible_transfers: A dictionary of the possible double transfer combinations
         :type possible_transfers: dict
-        :param key: The key of the possible_transfers dictionary.
+        :param key: The key of the possible_transfers dictionary
         :type key: int
-        :param team_player: A player from the team list.
+        :param team_player: A player from the team list
         :type team_player: str
-        :param max_budget: A list of the possible max budgets.
+        :param max_budget: A list of the possible max budgets
         :type max_budget: list
         :param teams: A list of the premier league teams of the players in the team, which updates while transfer
-        calculations are taking place.
+        calculations are taking place
         :type teams: list
-        :param teams_transfer: A list of the premier league teams of the players in the possible_transfers dictionary.
+        :param teams_transfer: A list of the premier league teams of the players in the possible_transfers dictionary
         :type teams_transfer: list
         :return: None
         """
@@ -1275,7 +1269,7 @@ class FPLteam:
 
     def transfer_double_loop(self) -> None:
         """
-        Double transfer suggestion loop.
+        Double transfer suggestion loop
 
         :return: None
         """
@@ -1338,9 +1332,9 @@ class FPLteam:
 
     def transfer_combinations(self) -> dict:
         """
-        Calculates all the possible duos from the team.
+        Calculates all the possible duos from the team
 
-        :return: A dictionary of possible double transfers from the team.
+        :return: A dictionary of possible double transfers from the team
         """
         possible_transfers = {}
         i = 0
@@ -1352,7 +1346,7 @@ class FPLteam:
 
     def save_new_entry(self) -> None:
         """
-        Creates a new save entry.
+        Creates a new save entry
 
         :return: None
         """
@@ -1399,13 +1393,13 @@ class FPLteam:
 
     def save_old_entry(self, new_user: str, saved_teams: dict) -> str:
         """
-        Saves on an old entry.
+        Saves on an old entry
 
-        :param new_user: The response of the user on whether he wants to create a new save entry.
+        :param new_user: The response of the user on whether he wants to create a new save entry
         :type new_user: str
-        :param saved_teams: A dictionary with information on a previously saved team.
+        :param saved_teams: A dictionary with information on a previously saved team
         :type saved_teams: dict
-        :return: The new_user response as a string.
+        :return: The new_user response as a string
         """
         username = ""
         password = ""
@@ -1450,13 +1444,13 @@ class FPLteam:
 
     def player_checks(self, name: str, team_player: str, used_players: list) -> bool:
         """
-        Checks for player parameters in order to update the team or some player list.
+        Checks for player parameters in order to update the team or some player list
 
-        :param name: Name of the player in check.
+        :param name: Name of the player in check
         :type name: str
-        :param team_player: Name of the player being replaced in the process.
+        :param team_player: Name of the player being replaced in the process
         :type team_player: str
-        :param used_players: A list of the players already used in the loops.
+        :param used_players: A list of the players already used in the loops
         :type used_players: list
         :return: True or False
         """
@@ -1476,7 +1470,7 @@ class FPLteam:
 
     def manager_pick(self) -> None:
         """
-        Updates the lists for picking a potential manager.
+        Updates the lists for picking a potential manager
 
         :return: None
         """
@@ -1499,13 +1493,13 @@ class FPLteam:
 
 def update_list(updating_list: list, insert_value: str, remove_value: str) -> None:
     """
-    Updates a list's values during player replacement or suggestion processes.
+    Updates a list's values during player replacement or suggestion processes
 
-    :param updating_list: List to be updated.
+    :param updating_list: List to be updated
     :type updating_list: list
-    :param insert_value: Value to be inserted in the list.
+    :param insert_value: Value to be inserted in the list
     :type insert_value: str
-    :param remove_value: Value to be removed from the list.
+    :param remove_value: Value to be removed from the list
     :type remove_value: str
     :return: None
     """
@@ -1515,9 +1509,9 @@ def update_list(updating_list: list, insert_value: str, remove_value: str) -> No
 
 def enter_budget_choice() -> str:
     """
-    Used in the enter_new_team method giving the choice of entering budget information.
+    Used in the enter_new_team method giving the choice of entering budget information
 
-    :return: A string of 'yes' or 'no'.
+    :return: A string of 'yes' or 'no'
     """
     budget_choice = ""
     while budget_choice.lower() != "yes" and budget_choice.lower() != "no":
@@ -1533,9 +1527,9 @@ def enter_budget_choice() -> str:
 
 def enter_player() -> str:
     """
-    Requests a player input (used in the enter_new_team method).
+    Requests a player input (used in the enter_new_team method)
 
-    :return: A string of the player name entered.
+    :return: A string of the player name entered
     """
     team_player = input("Add player: ")
     if team_player.lower() == "cancel":
@@ -1545,11 +1539,11 @@ def enter_player() -> str:
 
 def enter_budget(budget_choice: str) -> float:
     """
-    Requests selling price in the enter_new_team method if requested by the user.
+    Requests selling price in the enter_new_team method if requested by the user
 
-    :param budget_choice: Choice of whether to enter budget information or not ('yes' or 'no').
+    :param budget_choice: Choice of whether to enter budget information or not ('yes' or 'no')
     :type budget_choice: str
-    :return: A float of the player's price entered.
+    :return: A float of the player's price entered
     """
     player_price = ""
     type_correct = True
@@ -1574,9 +1568,9 @@ def enter_budget(budget_choice: str) -> float:
 
 def saved_get_username() -> str:
     """
-    Gets the username of the user for the open_saved_team method.
+    Gets the username of the user for the open_saved_team method
 
-    :return: A string of the user's username.
+    :return: A string of the user's username
     """
     username = ""
     with open("saved_teams.json", "r") as data:
@@ -1592,11 +1586,11 @@ def saved_get_username() -> str:
 
 def saved_get_password(username: str) -> str:
     """
-    Gets the password of the user for the open_saved_team method.
+    Gets the password of the user for the open_saved_team method
 
-    :param username: The user's username.
+    :param username: The user's username
     :type username: str
-    :return: A string of the user's password.
+    :return: A string of the user's password
     """
     password = ""
     with open("saved_teams.json", "r") as data:
@@ -1607,30 +1601,6 @@ def saved_get_password(username: str) -> str:
             raise ValueError
         if password != saved_team[username]["Password"]:
             print("\nWrong password.")
-    return password
-
-
-def user_get_username() -> str:
-    """
-    Gets the username of the user's official FPL account for the open_user_team method.
-
-    :return: A string of the user's username.
-    """
-    username = input("\nPlease enter your e-mail (or type 'cancel' to go back): ")
-    if username.lower() == "cancel":
-        raise ValueError
-    return username
-
-
-def user_get_password() -> str:
-    """
-    Gets the password of the user's official FPL account for the open_user_team method.
-
-    :return: A string of the user's password.
-    """
-    password = getpass("\nPlease enter your password (or type 'cancel' to go back): ")
-    if password.lower() == "cancel":
-        raise ValueError
     return password
 
 

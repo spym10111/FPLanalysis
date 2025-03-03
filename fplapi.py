@@ -26,7 +26,7 @@ class FPLapi:
     @cache
     def fpl_player_stats(self) -> pd.DataFrame:
         """
-        Gets statistics on players from the official Fantasy Premier League site.
+        Gets statistics on players from the official Fantasy Premier League site
 
         :return: A dataframe containing players' FPL information
         """
@@ -61,7 +61,7 @@ class FPLapi:
     @cache
     def fpl_fdr(self) -> pd.DataFrame:
         """
-        Gets the FDR values from the official Fantasy Premier League site.
+        Gets the FDR values from the official Fantasy Premier League site
 
         :return: A dataframe containing FDR information
         """
@@ -135,7 +135,7 @@ class FPLapi:
     @cache
     def get_team(self, username: str, password: str) -> dict:
         """
-        Gets information from the player's team id.
+        Gets information from the player's team id
 
         :param username: E-mail used for request on the FPL API
         :type username: str
@@ -192,10 +192,43 @@ class FPLapi:
         return team_dict
 
 
+def check_status(username: str, password: str) -> None:
+    """
+    Checks if the username and password provided correspond to an actual FPL account
+
+    :param username: E-mail used for request on the FPL API
+    :type username: str
+    :param password: Password used for request on the FPL API
+    :type password: str
+    :return: None
+    """
+    session = requests.session()
+    url = "https://users.premierleague.com/accounts/login/"
+    payload = {
+        "password": password,
+        "login": username,
+        "redirect_uri": "https://fantasy.premierleague.com/a/login",
+        "app": "plfpl-web"
+    }
+    headers = {
+        "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:130.0) Gecko/20100101 Firefox/130.0",
+        "accept-language": "en-US,en;q=0.5"
+    }
+    session.post(url, data=payload, headers=headers, verify=True)
+
+    response = session.get("https://fantasy.premierleague.com/api/me/", verify=True)
+    response.raise_for_status()
+    response_json = response.json()
+    team_id = response_json["player"]["entry"]
+
+    response_team = session.get(f"https://fantasy.premierleague.com/api/my-team/{team_id}")
+    response_team.raise_for_status()
+
+
 @cache
 def gw_played() -> int:
     """
-    Returns the last Gameweek played.
+    Returns the last Gameweek played
 
     :return: An integer of the last Gameweek played
     """

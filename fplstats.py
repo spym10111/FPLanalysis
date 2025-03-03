@@ -12,7 +12,7 @@ MAX_GW_NUMBER = 38
 
 class FPLstats:
     """
-    Holds the methods for calculating the FPL statistics.
+    Holds the methods for calculating the FPL statistics
 
     Attributes:
         fplapi: Calls the FPLapi class for getting information from the official source of the Fantasy Premier League
@@ -29,7 +29,7 @@ class FPLstats:
     def calculate_points(self) -> None:
         """
         Calculates the stats that are taken into account when creating the team or searching for players. The results
-        are stored in the players Dataframe created in the fplapi.py.
+        are stored in the players Dataframe created in the fplapi.py
 
         :return: None
         """
@@ -60,7 +60,7 @@ class FPLstats:
     @cache
     def player_stat(self, player_name: str, statistic_value: str):
         """
-        Returns a specific player's stat.
+        Returns a specific player's stat
 
         :param player_name: Name of the player
         :type player_name: str
@@ -75,9 +75,9 @@ class FPLstats:
 
     def fdr_product(self, fdr_gw: list) -> None:
         """
-        Calculates the FDR part of the function.
+        Calculates the FDR part of the function
 
-        :param fdr_gw: A list of the GWs included in the calculations.
+        :param fdr_gw: A list of the GWs included in the calculations
         :type fdr_gw: list
         :return: None
         """
@@ -125,7 +125,7 @@ class FPLstats:
 
     def calculation_factors(self) -> None:
         """
-        Used to calculate the point formula factors for every value. Creates a .json file with the values.
+        Used to calculate the point formula factors for every value. Creates a .json file with the values
 
         :return: None
         """
@@ -208,7 +208,7 @@ class FPLstats:
 
     def factor_point_calculation(self) -> None:
         """
-        Calculates the factor points.
+        Calculates the factor points
 
         :return: None
         """
@@ -223,7 +223,7 @@ class FPLstats:
 
     def point_calculation(self) -> None:
         """
-        Calculates the basic points for player comparison.
+        Calculates the basic points for player comparison
 
         :return: None
         """
@@ -249,7 +249,7 @@ class FPLstats:
 
     def captain_points(self) -> None:
         """
-        Calculates the captaincy points.
+        Calculates the captaincy points
 
         :return: None
         """
@@ -273,9 +273,9 @@ class FPLstats:
 
     def transfer_points(self, gw_number: int) -> None:
         """
-        Calculates the transfer points.
+        Calculates the transfer points
 
-        :param gw_number: An integer of the number of GWs played.
+        :param gw_number: An integer of the number of GWs played
         :type gw_number: int
         :return: None
         """
@@ -304,7 +304,7 @@ class FPLstats:
 
     def manager_points(self) -> None:
         """
-        Calculates points for manager comparison.
+        Calculates points for manager comparison
 
         :return: None
         """
@@ -319,7 +319,7 @@ class FPLstats:
 
 def fdr_input() -> list:
     """
-    Requests an input of the GW period for the calculations.
+    Requests an input of the GW period for the calculations
 
     :return: A list of the first and last GW from the input
     """
@@ -347,13 +347,13 @@ def fdr_input() -> list:
 
 def calculate_fdr(first_gw_number: int, last_gw_number: int) -> list:
     """
-    Calculates the FDR based on the user's input.
+    Calculates the FDR based on the user's input
 
     :param first_gw_number: An integer of the input of the first GW
     :type first_gw_number: int
     :param last_gw_number: An integer of the input of the last GW
     :type last_gw_number: int
-    :return: A list of the GWs that are going to be included in the calculations.
+    :return: A list of the GWs that are going to be included in the calculations
     """
     fdr_gw = []
     for gw in range(first_gw_number, last_gw_number + 1):

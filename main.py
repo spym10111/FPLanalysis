@@ -1,18 +1,27 @@
+import fplapi
 from fplteam import FPLteam
 import time
 import logos
-
-logos.print_header()
+from getpass import getpass
 
 
 def menu() -> None:
     """
-    Starting menu of the program.
+    Starting menu of the program
 
     :return: None
     """
+    print("\n\n--------------------------------------Log in--------------------------------------"
+          "-----------------")
     choice = 0
-    while choice not in [1, 2, 3, 4, 5]:
+    credentials = []
+    try:
+        credentials = log_in()
+    except NotImplementedError:
+        updating_delay()
+        choice = 5
+
+    while choice not in [1, 2, 3, 4, 5, 6]:
         print("\n\n-------------------------------------Main Menu------------------------------------"
               "-----------------")
         print("\nPlease enter a number from the list below: ")
@@ -21,7 +30,8 @@ def menu() -> None:
         print("\n3. Enter new team: You manually enter your team.")
         print("\n4. Open saved team: Open a previously saved team.")
         print("\n5. Rank players.")
-        print("\n6. Exit")
+        print("\n6. Log out.")
+        print("\n7. Exit")
 
         choice = pick_menu_number()
         print("")
@@ -30,7 +40,7 @@ def menu() -> None:
                 fplteam = FPLteam()
                 try:
                     # Using log-in information
-                    fplteam.open_user_team()
+                    fplteam.open_user_team(credentials[0], credentials[1])
                     fplteam.print_result()
                     fplteam.transfer_players()
                     fplteam.save_team()
@@ -101,6 +111,12 @@ def menu() -> None:
                 updating_delay()
                 break
         elif choice == 6:
+            try:
+                credentials = log_in()
+            except NotImplementedError:
+                updating_delay()
+                break
+        elif choice == 7:
             # Exits the program
             print("\nThank you for using FPL Analysis.")
             time.sleep(1)
@@ -116,7 +132,7 @@ def menu() -> None:
 
 def pick_menu_number() -> int:
     """
-    Gets the menu choice of the user.
+    Gets the menu choice of the user
 
     :return: int
     """
@@ -134,11 +150,11 @@ def pick_menu_number() -> int:
 
 def updating_delay() -> None:
     """
-    Gives an exit sequence in case the game is updating.
+    Gives an exit sequence in case the game is updating
 
     :return: None
     """
-    print("Unfortunately, the FPL official game is updating. The program will now exit. "
+    print("\nUnfortunately, the FPL official game is updating. The program will now exit. "
           "\nThank you for using FPL Analysis. Please come back later.")
     time.sleep(2)
     print("5...")
@@ -153,4 +169,47 @@ def updating_delay() -> None:
     time.sleep(1)
 
 
+def log_in() -> list:
+    """
+    Holds the credentials to an official FPL account
+
+    :return: A list of the username and password of the input
+    """
+    log_in_info = []
+    status_raise = True
+    while status_raise:
+        try:
+            username = user_get_username()
+            password = user_get_password()
+
+            fplapi.check_status(username, password)
+            log_in_info = [username, password]
+
+            status_raise = False
+        except TypeError:
+            print("\nInvalid e-mail or password.")
+    return log_in_info
+
+
+def user_get_username() -> str:
+    """
+    Gets the username of the user's official FPL account
+
+    :return: A string of the user's username
+    """
+    username = input("\nPlease enter your e-mail (or type 'cancel' to go back): ")
+    return username
+
+
+def user_get_password() -> str:
+    """
+    Gets the password of the user's official FPL account
+
+    :return: A string of the user's password
+    """
+    password = getpass("\nPlease enter your password (or type 'cancel' to go back): ")
+    return password
+
+
+logos.print_header()
 menu()
