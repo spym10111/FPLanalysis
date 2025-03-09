@@ -16,22 +16,24 @@ def menu() -> None:
     choice = 0
     credentials = []
     try:
+        # Logging in
         credentials = log_in()
     except NotImplementedError:
         updating_delay()
-        choice = 5
+        choice = 6
 
-    while choice not in [1, 2, 3, 4, 5, 6]:
+    while choice not in [1, 2, 3, 4, 5, 6, 7]:
         print("\n\n-------------------------------------Main Menu------------------------------------"
               "-----------------")
         print("\nPlease enter a number from the list below: ")
         print("\n\n1. Sign in to your FPL account: Use your FPL log-in information to get your team.")
-        print("\n2. Create new team: The program creates the best possible team for you.")
-        print("\n3. Enter new team: You manually enter your team.")
-        print("\n4. Open saved team: Open a previously saved team.")
-        print("\n5. Rank players.")
-        print("\n6. Log out.")
-        print("\n7. Exit")
+        print("\n2. Free Hit: Get your Free Hit team.")
+        print("\n3. Create new team: The program creates the best possible team for you.")
+        print("\n4. Enter new team: You manually enter your team.")
+        print("\n5. Open saved team: Open a previously saved team.")
+        print("\n6. Rank players: Ranks the given players.")
+        print("\n7. Log out.")
+        print("\n8. Exit")
 
         choice = pick_menu_number()
         print("")
@@ -44,7 +46,7 @@ def menu() -> None:
                     # Using log-in information
                     fplteam.open_user_team(credentials[0], credentials[1])
                     fplteam.print_result()
-                    fplteam.transfer_players()
+                    fplteam.transfer_players(mode="normal")
                     fplteam.save_team()
                 except ValueError:
                     choice = 0
@@ -54,13 +56,13 @@ def menu() -> None:
                 break
         elif choice == 2:
             try:
-                print("\n\n----------------------------------New Team (Auto)---------------------------------"
+                print("\n\n--------------------------------Free Hit--------------------------------"
                       "-----------------")
                 fplteam = FPLteam()
                 try:
-                    # Creating the best team without any inputs
-                    fplteam.create_new_team()
-                    fplteam.transfer_players()
+                    # Creates the best Free Hit team
+                    fplteam.free_hit(credentials[0], credentials[1])
+                    fplteam.transfer_players(mode="free_hit")
                     fplteam.save_team()
                 except ValueError:
                     choice = 0
@@ -68,16 +70,16 @@ def menu() -> None:
             except NotImplementedError:
                 updating_delay()
                 break
+
         elif choice == 3:
             try:
-                print("\n\n---------------------------------New Team (Manual)--------------------------------"
+                print("\n\n----------------------------------New Team (Auto)---------------------------------"
                       "-----------------")
                 fplteam = FPLteam()
                 try:
-                    # Creating a new team by entering names
-                    fplteam.enter_new_team()
-                    fplteam.print_result()
-                    fplteam.transfer_players()
+                    # Creating the best team without any inputs
+                    fplteam.create_new_team()
+                    fplteam.transfer_players(mode="normal")
                     fplteam.save_team()
                 except ValueError:
                     choice = 0
@@ -87,6 +89,23 @@ def menu() -> None:
                 break
         elif choice == 4:
             try:
+                print("\n\n---------------------------------New Team (Manual)--------------------------------"
+                      "-----------------")
+                fplteam = FPLteam()
+                try:
+                    # Creating a new team by entering names
+                    fplteam.enter_new_team()
+                    fplteam.print_result()
+                    fplteam.transfer_players(mode="normal")
+                    fplteam.save_team()
+                except ValueError:
+                    choice = 0
+                    continue
+            except NotImplementedError:
+                updating_delay()
+                break
+        elif choice == 5:
+            try:
                 print("\n\n------------------------------------Saved Team------------------------------------"
                       "-----------------")
                 fplteam = FPLteam()
@@ -94,7 +113,7 @@ def menu() -> None:
                     # Using a previously saved team
                     fplteam.open_saved_team()
                     fplteam.print_result()
-                    fplteam.transfer_players()
+                    fplteam.transfer_players(mode="normal")
                     fplteam.save_team()
                 except FileNotFoundError:
                     print("\nThere is no previously saved team.")
@@ -106,7 +125,7 @@ def menu() -> None:
             except NotImplementedError:
                 updating_delay()
                 break
-        elif choice == 5:
+        elif choice == 6:
             try:
                 print("\n\n--------------------------------Player Comparison---------------------------------"
                       "-----------------")
@@ -120,15 +139,16 @@ def menu() -> None:
             except NotImplementedError:
                 updating_delay()
                 break
-        elif choice == 6:
+        elif choice == 7:
             try:
                 print("\n\n---------------------------------------Login--------------------------------------"
                       "-----------------")
+                # Logging in again
                 credentials = log_in()
             except NotImplementedError:
                 updating_delay()
                 break
-        elif choice == 7:
+        elif choice == 8:
             # Exits the program
             print("\n\n---------------------------------------Exit---------------------------------------"
                   "-----------------")
@@ -151,10 +171,10 @@ def pick_menu_number() -> int:
     :return: int
     """
     choice = ""
-    while choice not in [1, 2, 3, 4, 5, 6, 7]:
+    while choice not in [1, 2, 3, 4, 5, 6, 7, 8]:
         try:
             choice = int(input("\n\nEnter number: "))
-            if choice not in [1, 2, 3, 4, 5, 6, 7]:
+            if choice not in [1, 2, 3, 4, 5, 6, 7, 8]:
                 print("\nInvalid number.")
         except ValueError:
             print("\nInvalid number.")
