@@ -145,6 +145,8 @@ class FPLstats:
             if (
                 self.player_stat(duo[0], "factor_point_calculation") != 0
                 and self.player_stat(duo[1], "factor_point_calculation") != 0
+                and self.player_stat(duo[0], "fdr_final") < 9998
+                and self.player_stat(duo[1], "fdr_final") < 9998
             ):
                 point_calculation_factor = (
                     float(self.player_stat(duo[0], "factor_point_calculation"))
@@ -153,38 +155,38 @@ class FPLstats:
                 point_calculation_factor_list.append(point_calculation_factor)
 
                 total_points_factor = (
-                    float(self.player_stat(duo[0], "total_points"))
-                    / float(self.player_stat(duo[1], "total_points"))
+                    (float(self.player_stat(duo[0], "total_points")))
+                    / (float(self.player_stat(duo[1], "total_points")))
                 )
                 total_points_factor_list.append(total_points_factor)
 
                 points_per_game_factor = (
-                    float(self.player_stat(duo[0], "points_per_game"))
-                    / float(self.player_stat(duo[1], "points_per_game"))
+                    (float(self.player_stat(duo[0], "points_per_game")))
+                    / (float(self.player_stat(duo[1], "points_per_game")))
                 )
                 points_per_game_factor_list.append(points_per_game_factor)
 
                 value_factor = (
-                    float(self.player_stat(duo[0], "value_season"))
-                    / float(self.player_stat(duo[1], "value_season"))
+                    (float(self.player_stat(duo[0], "value_season")))
+                    / (float(self.player_stat(duo[1], "value_season")))
                 )
                 value_factor_list.append(value_factor)
 
                 bonus_factor = (
-                    float(self.player_stat(duo[0], "bonus_new"))
-                    / float(self.player_stat(duo[1], "bonus_new"))
+                    (float(self.player_stat(duo[0], "bonus_new")))
+                    / (float(self.player_stat(duo[1], "bonus_new")))
                 )
                 bonus_factor_list.append(bonus_factor)
 
                 form_factor = (
-                    float(self.player_stat(duo[0], "form"))
-                    / float(self.player_stat(duo[1], "form"))
+                    (float(self.player_stat(duo[0], "form")))
+                    / (float(self.player_stat(duo[1], "form")))
                 )
                 form_factor_list.append(form_factor)
 
                 fdr_factor = (
-                    float(self.player_stat(duo[0], "fdr_final"))
-                    / float(self.player_stat(duo[1], "fdr_final"))
+                    (float(self.player_stat(duo[0], "fdr_final")))
+                    / (float(self.player_stat(duo[1], "fdr_final")))
                 )
                 fdr_factor_list.append(fdr_factor)
         avg_point_calculation_factor = abs(np.average(point_calculation_factor_list))

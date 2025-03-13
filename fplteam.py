@@ -43,7 +43,7 @@ class FPLteam:
         self.manager_points = []
         self.total_budget = 100.0
         self.starters_budget = 0.0
-        self.changes_budget = 0.0
+        self.changes_budget = 16.5
         self.bank_budget = 0.0
         self.starters_prices = []
         self.changes_prices = []
@@ -117,7 +117,7 @@ class FPLteam:
         self.manager_points = []
         self.total_budget = 100.0
         self.starters_budget = 0.0
-        self.changes_budget = 0.0
+        self.changes_budget = 16.5
         self.bank_budget = 0.0
         self.starters_prices = []
         self.changes_prices = []
@@ -169,7 +169,7 @@ class FPLteam:
         """
         self.reset_info()
         self.user_budget_changes(username, password)
-        bank_money = self.total_budget - 16.5
+        bank_money = self.total_budget - self.changes_budget
         self.reset_info()
         self.bank_budget = bank_money
         self.choose_system()
@@ -265,10 +265,12 @@ class FPLteam:
                 print(f"{points_list.index(sorted_comparing_players_dict[player]) + 1}. {player:21}"
                       f"{round(sorted_comparing_players_dict[player], 2)}")
 
-    def change_players(self) -> None:
+    def change_players(self, mode: str) -> None:
         """
         Function for replacing players if excluded
 
+        :param mode: Option between 'normal' and 'free_hit' that determines the type of update
+        :type mode: str
         :return: None
         """
         # Values that are going to be checked from the team
@@ -300,11 +302,13 @@ class FPLteam:
                     if team_player in self.team or team_player in used_players:
                         # First check replacing players without checking points just to remove them
                         self.change_players_first_loop(
-                            used_players, changing_players, team_player, max_budget, temp_teams, temp_teams_change
+                            used_players, changing_players, team_player, max_budget, temp_teams, temp_teams_change,
+                            mode=mode
                         )
                     else:
                         self.change_players_more_loops(
-                            used_players, changing_players, team_player, max_budget, temp_teams, temp_teams_change
+                            used_players, changing_players, team_player, max_budget, temp_teams, temp_teams_change,
+                            mode=mode
                         )
         for team_player in changing_players:
             self.add_player(team_player, mode="normal")
@@ -323,7 +327,7 @@ class FPLteam:
         all_teams = self.pl_all_teams()
 
         used_players = []
-        max_budget = round(self.total_budget - 16.5, 1)
+        max_budget = round(self.total_budget - self.changes_budget, 1)
 
         for n in range(11):
             # Loop again and retry used players
@@ -436,15 +440,17 @@ class FPLteam:
                            and changes_choice.lower() != "cancel"
                     ):
                         input_text = ""
+                        input_text_2 = ""
                         if mode == "normal":
-                            input_text = "replace/"
+                            input_text = "replace/wonderpick/"
+                            input_text_2 = ", wonder pick for one GW"
                         elif mode == "free_hit":
                             input_text = ""
-                        changes_choice = input(f"\nDo you want to find replacements "
-                                               f"or update the entire team ({input_text}update/cancel)? ")
+                        changes_choice = input(f"\nDo you want to find replacements{input_text_2}"
+                                               f" or update the entire team ({input_text}update/cancel)? ")
                         if changes_choice.lower() == "replace":
                             if mode == "normal":
-                                self.change_players()
+                                self.change_players(mode=mode)
                                 self.transfer_players(mode=mode)
                                 return None
                             elif mode == "free_hit":
@@ -455,6 +461,15 @@ class FPLteam:
                             self.update_team(mode=mode)
                             self.transfer_players(mode=mode)
                             return None
+                        elif changes_choice.lower() == "wonderpick":
+                            if mode == "normal":
+                                self.change_players(mode="free_hit")
+                                self.transfer_players(mode=mode)
+                                return None
+                            elif mode == "free_hit":
+                                self.update_team(mode=mode)
+                                self.transfer_players(mode=mode)
+                                return None
                         elif changes_choice.lower() == "cancel":
                             raise ValueError
                         else:
@@ -475,7 +490,7 @@ class FPLteam:
         if mode == "normal":
             self.transfer_single_loop()
         elif mode == "free_hit":
-            print("\nThere is no point running the singe player changes suggestion since the Free Hit choice "
+            print("\nThere is no point running the single player changes suggestion since the Free Hit choice "
                   "gives the optimal team.")
 
         extended_suggestion = ""
@@ -825,7 +840,7 @@ class FPLteam:
 
     def change_players_first_loop(
             self, used_players: list, changing_players: list, team_player: str, max_budget: list,
-            temp_teams: list, temp_teams_change: list
+            temp_teams: list, temp_teams_change: list, mode: str
     ) -> None:
         """
         First loop through players in the change_players method (Just replacing the original changing players)
@@ -842,15 +857,22 @@ class FPLteam:
         :type temp_teams: list
         :param temp_teams_change: A list of the changing players' premier league teams
         :type temp_teams_change: list
+        :param mode: Option between 'normal' and 'free_hit' that determines the type of update
+        :type mode: str
         :return: None
         """
+        calculation_mode = ""
+        if mode == "normal":
+            calculation_mode = "point_calculation"
+        elif mode == "free_hit":
+            calculation_mode = "captain_points"
         for name in self.fpl.player_data["name"]:
             if (
                 self.player_checks(name, team_player, used_players)
                 # Check if the player is already in the players that are about to change
                 and name not in changing_players
                 # Check for valid points
-                and self.fpl.player_stat(name, "point_calculation") > 0
+                and self.fpl.player_stat(name, calculation_mode) > 0
             ):
                 temporary_budget = round(
                     (
@@ -894,7 +916,7 @@ class FPLteam:
 
     def change_players_more_loops(
             self, used_players: list, changing_players: list, team_player: str, max_budget: list,
-            temp_teams: list, temp_teams_change: list
+            temp_teams: list, temp_teams_change: list, mode: str
     ) -> None:
         """
         Loops after the first loop through players in the change_players method
@@ -911,20 +933,27 @@ class FPLteam:
         :type temp_teams: list
         :param temp_teams_change: A list of the changing players' premier league teams
         :type temp_teams_change: list
+        :param mode: Option between 'normal' and 'free_hit' that determines the type of update
+        :type mode: str
         :return: None
         """
+        calculation_mode = ""
+        if mode == "normal":
+            calculation_mode = "point_calculation"
+        elif mode == "free_hit":
+            calculation_mode = "captain_points"
         for name in self.fpl.player_data["name"]:
             if (
                 self.player_checks(name, team_player, used_players)
                 # Check if the player is already in the players that are about to change
                 and name not in changing_players
                 # Check for valid points
-                and self.fpl.player_stat(name, "point_calculation") > 0
+                and self.fpl.player_stat(name, calculation_mode) > 0
                 # Check for better points
-                and sum([self.fpl.player_stat(player, "point_calculation")
+                and sum([self.fpl.player_stat(player, calculation_mode)
                          for player in changing_players])
-                < self.fpl.player_stat(name, "point_calculation")
-                + sum([self.fpl.player_stat(player, "point_calculation")
+                < self.fpl.player_stat(name, calculation_mode)
+                + sum([self.fpl.player_stat(player, calculation_mode)
                        for player in changing_players if player != team_player])
             ):
                 temporary_budget = round(
@@ -962,8 +991,8 @@ class FPLteam:
                                     # updating
                                     player != team_player
                                     # Check for better points
-                                    and self.fpl.player_stat(player, "point_calculation")
-                                    > self.fpl.player_stat(name, "point_calculation") > 0
+                                    and self.fpl.player_stat(player, calculation_mode)
+                                    > self.fpl.player_stat(name, calculation_mode) > 0
                                     # Check team limit
                                     and player_team_number > 2
                                     # Check team
@@ -977,8 +1006,8 @@ class FPLteam:
                                       # updating
                                       player != team_player
                                       # Check for better points
-                                      and 0 < self.fpl.player_stat(player, "point_calculation")
-                                      < self.fpl.player_stat(name, "point_calculation")
+                                      and 0 < self.fpl.player_stat(player, calculation_mode)
+                                      < self.fpl.player_stat(name, calculation_mode)
                                       # Check team limit
                                       and player_team_number > 2
                                       # Check team
@@ -1131,7 +1160,7 @@ class FPLteam:
 
         :return: None
         """
-        max_budget_single_transfer = round(self.total_budget - 16.5, 1)
+        max_budget_single_transfer = round(self.total_budget - self.changes_budget, 1)
         used_players = []
         for player in self.team:
             possible_transfers = {}
