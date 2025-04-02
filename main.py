@@ -1,3 +1,5 @@
+import requests.exceptions
+
 import fplapi
 from fplteam import FPLteam
 import time
@@ -20,6 +22,9 @@ def menu() -> None:
         credentials = log_in()
     except NotImplementedError:
         updating_delay()
+        choice = 6
+    except requests.exceptions.ConnectionError:
+        connectivity_delay()
         choice = 6
 
     while choice not in [1, 2, 3, 4, 5, 6, 7]:
@@ -190,6 +195,27 @@ def updating_delay() -> None:
     """
     print("\nUnfortunately, the FPL official game is updating. The program will now exit. "
           "\nThank you for using FPL Analysis. Please come back later.")
+    time.sleep(2)
+    print("5...")
+    time.sleep(1)
+    print("4...")
+    time.sleep(1)
+    print("3...")
+    time.sleep(1)
+    print("2...")
+    time.sleep(1)
+    print("1...")
+    time.sleep(1)
+
+
+def connectivity_delay() -> None:
+    """
+        Gives an exit sequence in case of connection problem
+
+        :return: None
+        """
+    print("\nThere is a connection problem. Please check your internet connection and try again."
+          "\nThank you for using FPL Analysis.")
     time.sleep(2)
     print("5...")
     time.sleep(1)
