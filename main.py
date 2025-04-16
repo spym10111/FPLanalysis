@@ -33,7 +33,7 @@ def menu() -> None:
         print("\nPlease enter a number from the list below: ")
         print("\n\n1. Sign in to your FPL account: Use your FPL log-in information to get your team.")
         print("\n2. Free Hit: Get your Free Hit team.")
-        print("\n3. Create new team: The program creates the best possible team for you.")
+        print("\n3. Wildcard/Starting team: The program creates the best possible team for you.")
         print("\n4. Enter new team: You manually enter your team.")
         print("\n5. Open saved team: Open a previously saved team.")
         print("\n6. Rank players: Ranks the given players.")
@@ -83,7 +83,7 @@ def menu() -> None:
                 fplteam = FPLteam()
                 try:
                     # Creating the best team without any inputs
-                    fplteam.create_new_team()
+                    fplteam.create_new_team(credentials[0], credentials[1])
                     fplteam.transfer_players(mode="normal")
                     fplteam.save_team()
                 except ValueError:

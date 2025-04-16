@@ -144,15 +144,23 @@ class FPLteam:
         print(f"Captaincy points: {self.captain_points}")
         print(f"Manager points: {self.manager_points[self.manager_points.index(max(self.manager_points))]}")
 
-    def create_new_team(self) -> None:
+    def create_new_team(self, username: str, password: str) -> None:
         """
         Calculates a new team without any inputs
 
         :return: None
         """
         self.reset_info()
+        self.user_budget_changes(username, password)
+        self.bank_budget = self.total_budget - self.changes_budget
+        bank_money = self.bank_budget
+        total_money = self.total_budget
+        changes_money = self.changes_budget
+        self.reset_info()
         self.choose_system()
-        self.bank_budget = 100.0 - 16.5
+        self.bank_budget = bank_money
+        self.total_budget = total_money
+        self.changes_budget = changes_money
 
         self.create_loop_players(mode="normal")
         self.update_team(mode="normal")
@@ -609,14 +617,14 @@ class FPLteam:
                 # Check managers out
                 or self.fpl.player_stat(name, "position") == "MNG"
                 # Check position limit
-                or self.fpl.player_stat(name, "position") == "GKP"
-                and self.team_positions.count("GKP") == 1
-                or self.fpl.player_stat(name, "position") == "DEF"
-                and self.team_positions.count("DEF") == self.system[0]
-                or self.fpl.player_stat(name, "position") == "MID"
-                and self.team_positions.count("MID") == self.system[1]
-                or self.fpl.player_stat(name, "position") == "FWD"
-                and self.team_positions.count("FWD") == self.system[2]
+                or (self.fpl.player_stat(name, "position") == "GKP"
+                    and self.team_positions.count("GKP") == 1)
+                or (self.fpl.player_stat(name, "position") == "DEF"
+                    and self.team_positions.count("DEF") == self.system[0])
+                or (self.fpl.player_stat(name, "position") == "MID"
+                    and self.team_positions.count("MID") == self.system[1])
+                or (self.fpl.player_stat(name, "position") == "FWD"
+                    and self.team_positions.count("FWD") == self.system[2])
             ):
                 continue
             else:
@@ -1634,6 +1642,7 @@ class FPLteam:
             if (
                 self.fpl.player_stat(manager, "position") == "MNG"
                 and self.fpl.player_stat(manager, "cost") <= self.bank_budget
+                and self.player_teams.count(self.fpl.player_stat(manager, "team")) < 3
             ):
                 self.managers.append(manager)
                 self.manager_points.append(self.fpl.player_stat(manager, "manager_points"))
