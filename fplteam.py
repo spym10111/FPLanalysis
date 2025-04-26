@@ -177,10 +177,12 @@ class FPLteam:
         """
         self.reset_info()
         self.user_budget_changes(username, password)
-        bank_money = self.total_budget - self.changes_budget
+        bank_money = self.total_budget - 16.5
+        total_budget = self.total_budget
         self.reset_info()
-        self.bank_budget = bank_money
         self.choose_system()
+        self.bank_budget = bank_money
+        self.total_budget = total_budget
 
         self.create_loop_players(mode="free_hit")
         self.update_team(mode="free_hit")
@@ -842,9 +844,10 @@ class FPLteam:
         """
         for team in all_teams:
             if self.player_teams.count(team) < 3:
-                for player in used_players:
-                    if self.fpl.player_stat(player, "team") == team:
-                        used_players.remove(player)
+                for n in range(11):
+                    for player in used_players:
+                        if self.fpl.player_stat(player, "team") == team:
+                            used_players.remove(player)
 
     def change_players_first_loop(
             self, used_players: list, changing_players: list, team_player: str, max_budget: list,
