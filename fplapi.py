@@ -172,8 +172,8 @@ class FPLapi:
             element_prices.append(price / 10)
 
         team_dict = {
-            "total_budget": sum(picks["selling_price"]) / 10 + (transfers["bank"][0] / 10),
-            "starters_budget": sum(picks["selling_price"]) / 10 - sum(picks["selling_price"][11:15]) / 10,
+            "total_budget": picks["selling_price"].sum() / 10 + (transfers["bank"][0] / 10),
+            "starters_budget": picks["selling_price"].sum() / 10 - picks["selling_price"][11:15].sum() / 10,
             "changes_budget": sum([picks["selling_price"][11], picks["selling_price"][12], picks["selling_price"][13],
                                    picks["selling_price"][14]]) / 10,
             "bank_budget": transfers["bank"][0] / 10,
@@ -190,6 +190,55 @@ class FPLapi:
                 element_prices[team_dict["team_elements"].index(element)]
             )
         return team_dict
+
+
+@cache
+def fpl_player_history(player_id: int, fixture: int) -> dict:
+    """
+    Gets data from previous Gameweeks for a player
+    :param player_id: The player's ID on the FPL API
+    :type player_id: int
+    :param fixture: The Gameweek up to which the values are calculated
+    :type fixture: int
+    :return: A dictionary of values used for factor point calculation
+    """
+    pd.set_option("display.max_columns", None)
+    np.set_printoptions(legacy="1.25")
+
+    base_url = "https://fantasy.premierleague.com/api/"
+    r = requests.get(f"{base_url}element-summary/{player_id}", verify=True).json()
+    history = pd.json_normalize(r["history"])
+
+    date = history[history["round"] == fixture]["kickoff_time"].tolist()[0]
+    gw = history[history["round"] == fixture]["round"].tolist()[0]
+    fixture_points = history[history["round"] == fixture]["total_points"].tolist()[0]
+    total_points = history[history["round"] <= fixture]["total_points"].sum()
+    points_per_game = total_points / fixture
+    form = 0
+    if fixture <= 5:
+        form = total_points / fixture
+    elif fixture > 5:
+        form_points = history[(history["round"] <= fixture)
+                              & (history["round"] > fixture - 5)]["total_points"].sum()
+        form = form_points / 5
+    cost = history[history["round"] == fixture]["value"].tolist()[0] / 10
+    value_season = total_points / cost
+    bonus = history[history["round"] <= fixture]["bonus"].sum() + fixture
+
+    print(history)
+    player_history_stats = {
+        "id": history["element"][0],
+        "date": date,
+        "gw": gw,
+        "gw_points": fixture_points,
+        "total_points": round(total_points, 1),
+        "ppg": round(points_per_game, 1),
+        "form": round(form, 1),
+        "value_season": round(value_season, 1),
+        "bonus": round(bonus, 1),
+    }
+
+    return player_history_stats
 
 
 def check_status(username: str, password: str) -> None:
@@ -245,4 +294,5 @@ def gw_played() -> int:
 
 
 if __name__ == "__main__":
-    print(FPLapi().fpl_fdr())
+    print(fpl_player_history(17, 6))
+    # print(FPLapi().fpl_player_stats())
