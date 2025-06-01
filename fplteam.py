@@ -164,6 +164,8 @@ class FPLteam:
 
         self.create_loop_players(mode="normal")
         self.update_team(mode="normal")
+        for player in self.team:
+            self.starters_prices.append(self.fpl.player_stat(player, "cost"))
 
     def free_hit(self, username: str, password: str) -> None:
         """

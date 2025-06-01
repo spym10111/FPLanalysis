@@ -2,6 +2,7 @@ import requests.exceptions
 
 import fplapi
 from fplteam import FPLteam
+from fplstats import FPLstats
 import time
 import logos
 from getpass import getpass
@@ -27,7 +28,7 @@ def menu() -> None:
         connectivity_delay()
         choice = 6
 
-    while choice not in [1, 2, 3, 4, 5, 6, 7]:
+    while choice not in [1, 2, 3, 4, 5, 6, 7, 8]:
         print("\n\n-------------------------------------Main Menu------------------------------------"
               "-----------------")
         print("\nPlease enter a number from the list below: ")
@@ -37,8 +38,9 @@ def menu() -> None:
         print("\n4. Enter new team: You manually enter your team.")
         print("\n5. Open saved team: Open a previously saved team.")
         print("\n6. Rank players: Ranks the given players.")
-        print("\n7. Log out.")
-        print("\n8. Exit")
+        print("\n7. Update factors: Updating the formula used for calculation.")
+        print("\n8. Log out.")
+        print("\n9. Exit")
 
         choice = pick_menu_number()
         print("")
@@ -146,6 +148,21 @@ def menu() -> None:
                 break
         elif choice == 7:
             try:
+                print("\n\n---------------------------------Factors Update-----------------------------------"
+                      "-----------------")
+                print("\nUpdating...")
+                fpl = FPLstats()
+                try:
+                    fpl.calculation_factors()
+                    print("\nUpdate complete.")
+                except ValueError:
+                    choice = 0
+                    continue
+            except NotImplementedError:
+                updating_delay()
+                break
+        elif choice == 8:
+            try:
                 print("\n\n---------------------------------------Login--------------------------------------"
                       "-----------------")
                 # Logging in again
@@ -153,7 +170,7 @@ def menu() -> None:
             except NotImplementedError:
                 updating_delay()
                 break
-        elif choice == 8:
+        elif choice == 9:
             # Exits the program
             print("\n\n---------------------------------------Exit---------------------------------------"
                   "-----------------")
@@ -176,10 +193,10 @@ def pick_menu_number() -> int:
     :return: int
     """
     choice = ""
-    while choice not in [1, 2, 3, 4, 5, 6, 7, 8]:
+    while choice not in [1, 2, 3, 4, 5, 6, 7, 8, 9]:
         try:
             choice = int(input("\n\nEnter number: "))
-            if choice not in [1, 2, 3, 4, 5, 6, 7, 8]:
+            if choice not in [1, 2, 3, 4, 5, 6, 7, 8, 9]:
                 print("\nInvalid number.")
         except ValueError:
             print("\nInvalid number.")

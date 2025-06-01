@@ -196,6 +196,7 @@ class FPLapi:
 def fpl_player_history(player_id: int, fixture: int) -> dict:
     """
     Gets data from previous Gameweeks for a player
+
     :param player_id: The player's ID on the FPL API
     :type player_id: int
     :param fixture: The Gameweek up to which the values are calculated
@@ -225,7 +226,6 @@ def fpl_player_history(player_id: int, fixture: int) -> dict:
     value_season = total_points / cost
     bonus = history[history["round"] <= fixture]["bonus"].sum() + fixture
 
-    print(history)
     player_history_stats = {
         "id": history["element"][0],
         "date": date,
