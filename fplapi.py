@@ -212,7 +212,7 @@ def fpl_player_history(player_id: int, fixture: int) -> dict:
 
     date = history[history["round"] == fixture]["kickoff_time"].tolist()[0]
     gw = history[history["round"] == fixture]["round"].tolist()[0]
-    fixture_points = history[history["round"] == fixture]["total_points"].tolist()[0]
+    fixture_points = history[history["round"] == fixture]["total_points"].sum()
     total_points = history[history["round"] <= fixture]["total_points"].sum()
     points_per_game = total_points / fixture
     form = 0
@@ -294,5 +294,5 @@ def gw_played() -> int:
 
 
 if __name__ == "__main__":
-    print(fpl_player_history(17, 6))
+    print(fpl_player_history(17, 33))
     # print(FPLapi().fpl_player_stats())
