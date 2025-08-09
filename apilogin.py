@@ -26,13 +26,22 @@ def generate_code_challenge(verifier):
 
 
 class Login:
+    """
+    Used to log into the Fantasy Premier League API.
+
+    Attributes:
+        username: E-mail used for logging in
+        password: Password used for logging in
+        team_id: Player's team ID
+        access_token: Token needed to access API elements
+    """
     def __init__(self, username, password):
         self.username = ""
         self.password = ""
         self.team_id = 0
-        self.response_team = {}
         self.access_token = ""
 
+        print("Authentication: ", end="")
         code_verifier = generate_code_verifier()  # code_verifier for PKCE
         code_challenge = generate_code_challenge(code_verifier)  # code_challenge from the code_verifier
         initial_state = uuid.uuid4().hex  # random initial state for the OAuth flow
@@ -56,8 +65,10 @@ class Login:
         access_token = re.search(r'"accessToken":"([^"]+)"', auth_html).group(1)
         # new state used for resume post request later
         new_state = re.search(r'<input[^>]+name="state"[^>]+value="([^"]+)"', auth_html).group(1)
+        print("done")
 
         # Start
+        print("Starting...")
         headers = {
             "Authorization": f"Bearer {access_token}",
             "Content-Type": "application/json",
@@ -69,6 +80,7 @@ class Login:
         interaction_token = response_json["interactionToken"]
 
         # Login
+        print("Login: ", end="")
         response = session.post(
             URL["login"],
             headers={
@@ -124,8 +136,10 @@ class Login:
 
         location = response.headers["Location"]
         auth_code = re.search(r"[?&]code=([^&]+)", location).group(1)
+        print("done")
 
         # Enter
+        print("Accessing...")
         response = session.post(
             URL["token"],
             data={
@@ -145,8 +159,6 @@ class Login:
         response.raise_for_status()
 
         self.team_id = response.json()["player"]["entry"]
-        self.response_team = session.get(f"https://fantasy.premierleague.com/api/my-team/{self.team_id}",
-                                         headers={"X-API-Authorization": f"Bearer {self.access_token}"})
 
 
 # if __name__ == "__main__":

@@ -1,9 +1,9 @@
 import numpy as np
-from functools import cache
 import fplapi
 from fplapi import FPLapi
 import json
 from datetime import datetime
+from functools import cache
 
 MIN_GW_NUMBER = 1
 MAX_GW_NUMBER = 38

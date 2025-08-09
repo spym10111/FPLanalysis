@@ -7,12 +7,14 @@ from apilogin import Login
 TOTAL_GW_NUMBER = 38
 
 
+@cache
 class FPLapi:
     """
     Holds methods that return fantasy statistics on players from the official Premier League source:
     www.premierleague.com
 
     Attributes:
+        apilogin: Calls the Login class to log into the Fantasy Premier League API
         main_df: The main dataframe with all the player stats
         fixtures_df: The dataframe containing the info on the FDR per team
         team_id: The teams id we get after entering the log-in information
@@ -227,6 +229,7 @@ def fpl_player_history(player_id: int, fixture: int) -> dict:
     return player_history_stats
 
 
+@cache
 def check_status(username: str, password: str) -> None:
     """
     Checks if the username and password provided correspond to an actual FPL account

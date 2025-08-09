@@ -174,14 +174,9 @@ def menu() -> None:
             # Exits the program
             print("\n\n---------------------------------------Exit---------------------------------------"
                   "-----------------")
-            print("\nThank you for using FPL Analysis.")
-            time.sleep(1)
-            print("3...")
-            time.sleep(1)
-            print("2...")
-            time.sleep(1)
-            print("1...")
-            time.sleep(1)
+            print("\nThank you for using FPL Analysis."
+                  "\nExiting...")
+            time.sleep(4)
             break
         choice = 0
 
@@ -211,18 +206,9 @@ def updating_delay() -> None:
     :return: None
     """
     print("\nUnfortunately, the FPL official game is updating. The program will now exit. "
-          "\nThank you for using FPL Analysis. Please come back later.")
-    time.sleep(2)
-    print("5...")
-    time.sleep(1)
-    print("4...")
-    time.sleep(1)
-    print("3...")
-    time.sleep(1)
-    print("2...")
-    time.sleep(1)
-    print("1...")
-    time.sleep(1)
+          "\nThank you for using FPL Analysis. Please come back later."
+          "\nExiting...")
+    time.sleep(7)
 
 
 def connectivity_delay() -> None:
@@ -232,18 +218,9 @@ def connectivity_delay() -> None:
         :return: None
         """
     print("\nThere is a connection problem. Please check your internet connection and try again."
-          "\nThank you for using FPL Analysis.")
-    time.sleep(2)
-    print("5...")
-    time.sleep(1)
-    print("4...")
-    time.sleep(1)
-    print("3...")
-    time.sleep(1)
-    print("2...")
-    time.sleep(1)
-    print("1...")
-    time.sleep(1)
+          "\nThank you for using FPL Analysis."
+          "\nExiting...")
+    time.sleep(7)
 
 
 def log_in() -> list:
@@ -265,7 +242,7 @@ def log_in() -> list:
 
             status_raise = False
         except requests.exceptions.HTTPError:
-            print("\nInvalid e-mail or password.")
+            print("Invalid e-mail or password.")
     return log_in_info
 
 
