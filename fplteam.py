@@ -30,8 +30,8 @@ class FPLteam:
         unavailable_players_list: List of players excluded from the calculation
         system: List of number of players per position in the team
     """
-    def __init__(self):
-        self.fpl = FPLstats()
+    def __init__(self, username, password):
+        self.fpl = FPLstats(username, password)
 
         self.team = []
         self.team_positions = []
@@ -144,7 +144,7 @@ class FPLteam:
         print(f"Captaincy points: {self.captain_points}")
         print(f"Manager points: {self.manager_points[self.manager_points.index(max(self.manager_points))]}")
 
-    def create_new_team(self, username: str, password: str) -> None:
+    def create_new_team(self, username, password) -> None:
         """
         Calculates a new team without any inputs
 
@@ -164,15 +164,13 @@ class FPLteam:
 
         self.create_loop_players(mode="normal")
         self.update_team(mode="normal")
+        for player in self.team:
+            self.starters_prices.append(self.fpl.player_stat(player, "cost"))
 
-    def free_hit(self, username: str, password: str) -> None:
+    def free_hit(self, username, password) -> None:
         """
         Calculates a Free Hit team
 
-        :param username: E-mail used for request on the FPL API
-        :type username: str
-        :param password: Password used for request on the FPL API
-        :type password: str
         :return: None
         """
         self.reset_info()
@@ -220,14 +218,10 @@ class FPLteam:
             self.saved_loop_players(saved_team, username)
             self.saved_budget_changes(saved_team, username)
 
-    def open_user_team(self, username: str, password: str) -> None:
+    def open_user_team(self, username, password) -> None:
         """
         Opens a new team based on a user's official Fantasy Premier League log-in information
 
-        :param username: E-mail used for request on the FPL API
-        :type username: str
-        :param password: Password used for request on the FPL API
-        :type password: str
         :return: None
         """
         self.reset_info()
@@ -779,15 +773,11 @@ class FPLteam:
         self.starters_prices = saved_team[username]["Starters_prices"]
         self.changes_prices = saved_team[username]["Changes_prices"]
 
-    def user_team_players(self, username: str, password: str) -> None:
+    def user_team_players(self, username, password) -> None:
         """
         Gets the user's team from the official FPL API using his log-in information
         (used in the open_user_team method)
 
-        :param username: The user's username
-        :type username: str
-        :param password: The user's password
-        :type password: str
         :return: None
         """
         team_list_elements = self.fpl.fplapi.get_team(username, password)["team_elements"]
@@ -802,14 +792,10 @@ class FPLteam:
         for player in team_starters:
             self.add_player(player, mode="normal")
 
-    def user_budget_changes(self, username: str, password: str) -> None:
+    def user_budget_changes(self, username, password) -> None:
         """
         Changes the budget values in the open_user_team method
 
-        :param username: The user's username from his official FPL account
-        :type username: str
-        :param password: The user's password from his official FPL account
-        :type password: str
         :return: None
         """
         self.total_budget = round(self.fpl.fplapi.get_team(username, password)["total_budget"], 1)
@@ -1769,5 +1755,5 @@ def saved_get_password(username: str) -> str:
     return password
 
 
-if __name__ == "__main__":
-    FPLteam().compare_players()
+# if __name__ == "__main__":
+#     FPLteam(username, password).compare_players()

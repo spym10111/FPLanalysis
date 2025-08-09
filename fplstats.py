@@ -1,10 +1,9 @@
 import numpy as np
 from functools import cache
-
 import fplapi
 from fplapi import FPLapi
-from itertools import combinations
 import json
+from datetime import datetime
 
 MIN_GW_NUMBER = 1
 MAX_GW_NUMBER = 38
@@ -19,11 +18,12 @@ class FPLstats:
         player_data: Calls the method for the official Fantasy Premier League stats
         fdr_data: Calls the method for the official Fantasy Premier League FDR
     """
-    def __init__(self):
+    def __init__(self, username, password):
         # Getting the Dataframes
-        self.fplapi = FPLapi()
+        self.fplapi = FPLapi(username, password)
         self.player_data = self.fplapi.fpl_player_stats()
         self.fdr_data = self.fplapi.fpl_fdr()
+        self.last_gw_number = 0
         np.set_printoptions(legacy="1.25")
 
     def calculate_points(self) -> None:
@@ -37,23 +37,21 @@ class FPLstats:
         fdr_range = fdr_input()
         fdr_gw = calculate_fdr(fdr_range[0], fdr_range[1])
         # Number of GWs the statistics correspond to
-        gw_number = fplapi.gw_played()
+        self.last_gw_number = fplapi.gw_played()
         # Calculating the FDR part of the function
         self.fdr_product(fdr_gw)
 
         # The functions used for team selection
         self.player_data["bonus_new"] = self.player_data["bonus"] + 1
-        # Calculating factor points
-        self.factor_point_calculation()
-        self.calculation_factors()
+        self.player_data["form_new"] = self.player_data["form"].astype(float) + (1/1000)
         # Calculating points for player comparison
-        self.point_calculation()
+        self.point_calculation(fdr_range[0], fdr_range[1])
         # Calculating points for captaincy comparison
-        self.captain_points()
+        self.captain_points(fdr_range[0], fdr_range[1])
         # Calculating points for transfer comparison
-        self.transfer_points(gw_number)
+        self.transfer_points(self.last_gw_number, fdr_range[0], fdr_range[1])
         # Calculating points for manager comparison
-        self.manager_points()
+        self.manager_points(fdr_range[0], fdr_range[1])
 
         self.player_data.sort_values(by=["point_calculation", "points_per_game"], ascending=False)
 
@@ -77,7 +75,7 @@ class FPLstats:
         """
         Calculates the FDR part of the function
 
-        :param fdr_gw: A list of the GWs included in the calculations
+        :param fdr_gw: A list of the first and last GWs included in the calculations
         :type fdr_gw: list
         :return: None
         """
@@ -129,193 +127,397 @@ class FPLstats:
 
         :return: None
         """
-        player_list = []
-        for name in self.player_data["name"]:
-            player_list.append(name)
+        try:
+            with open("factors.json", "r") as data:
+                factors = json.load(data)
+        except FileNotFoundError:
+            factors_dict_start = {}
+            for gw_start in range(1, 39):
+                factors_dict_start[gw_start] = {}
+                factors_dict_start[gw_start]["total_points_factor"] = 0
+                factors_dict_start[gw_start]["ppg_factor"] = 0
+                factors_dict_start[gw_start]["value_factor"] = 0
+                factors_dict_start[gw_start]["bonus_factor"] = 0
+                factors_dict_start[gw_start]["form_factor"] = 0
+                factors_dict_start[gw_start]["fdr_factor"] = 1
+                factors_dict_start[gw_start]["player_num"] = 1
+                factors_dict_start[gw_start]["gw"] = gw_start
+                factors_dict_start[gw_start]["last_date"] = "2023-08-17T14:00:00Z"
+            with open("factors.json", "w") as data:
+                json.dump(factors_dict_start, data, indent=4)
+            with open("factors.json", "r") as data_file:
+                factors = json.load(data_file)
 
-        point_calculation_factor_list = []
-        total_points_factor_list = []
-        points_per_game_factor_list = []
-        value_factor_list = []
-        bonus_factor_list = []
-        form_factor_list = []
-        fdr_factor_list = []
-
-        for duo in combinations(player_list, 2):
+        for gw in factors.keys():
+            player_id_list = self.player_data["id_x"].tolist()
+            player_id_list.sort()
+            try:
+                player_check = fplapi.fpl_player_history(1, int(gw))
+            except IndexError:
+                player_check = fplapi.fpl_player_history(100, int(gw))
+            except KeyError:
+                return None
+            player_check_date = datetime.strptime(player_check["date"], "%Y-%m-%dT%H:%M:%SZ")
+            factors_check_date = datetime.strptime(factors[gw]["last_date"], "%Y-%m-%dT%H:%M:%SZ")
             if (
-                self.player_stat(duo[0], "factor_point_calculation") != 0
-                and self.player_stat(duo[1], "factor_point_calculation") != 0
-                and self.player_stat(duo[0], "fdr_final") < 9998
-                and self.player_stat(duo[1], "fdr_final") < 9998
+                player_check_date <= factors_check_date
             ):
-                point_calculation_factor = (
-                    float(self.player_stat(duo[0], "factor_point_calculation"))
-                    / float(self.player_stat(duo[1], "factor_point_calculation"))
-                )
-                point_calculation_factor_list.append(point_calculation_factor)
+                continue
 
-                total_points_factor = (
-                    (float(self.player_stat(duo[0], "total_points")))
-                    / (float(self.player_stat(duo[1], "total_points")))
-                )
-                total_points_factor_list.append(total_points_factor)
+            new_total_points_factor = factors[gw]["total_points_factor"]
+            new_ppg_factor = factors[gw]["ppg_factor"]
+            new_value_factor = factors[gw]["value_factor"]
+            new_bonus_factor = factors[gw]["bonus_factor"]
+            new_form_factor = factors[gw]["form_factor"]
+            new_fdr_factor = factors[gw]["fdr_factor"]
+            new_player_num = factors[gw]["player_num"]
 
-                points_per_game_factor = (
-                    (float(self.player_stat(duo[0], "points_per_game")))
-                    / (float(self.player_stat(duo[1], "points_per_game")))
-                )
-                points_per_game_factor_list.append(points_per_game_factor)
+            print(f"{gw}/{MAX_GW_NUMBER}")
+            for player_id in player_id_list:
+                print(f"{player_id}/{len(player_id_list)}")
+                try:
+                    player_history_data = fplapi.fpl_player_history(int(player_id), int(gw))
+                except IndexError:
+                    continue
 
-                value_factor = (
-                    (float(self.player_stat(duo[0], "value_season")))
-                    / (float(self.player_stat(duo[1], "value_season")))
-                )
-                value_factor_list.append(value_factor)
+                if (
+                    player_history_data["total_points"] <= 0
+                    or player_history_data["ppg"] <= 0
+                    or player_history_data["value_season"] <= 0
+                    or player_history_data["bonus"] <= 0
+                    or player_history_data["form_new"] <= 0
+                ):
+                    continue
+                else:
+                    total_points_factor = player_history_data["gw_points"] / player_history_data["total_points"]
+                    ppg_factor = player_history_data["gw_points"] / player_history_data["ppg"]
+                    value_factor = player_history_data["gw_points"] / player_history_data["value_season"]
+                    bonus_factor = player_history_data["gw_points"] / player_history_data["bonus"]
+                    form_factor = player_history_data["gw_points"] / player_history_data["form_new"]
 
-                bonus_factor = (
-                    (float(self.player_stat(duo[0], "bonus_new")))
-                    / (float(self.player_stat(duo[1], "bonus_new")))
-                )
-                bonus_factor_list.append(bonus_factor)
+                team = self.player_data[self.player_data["id_x"] == player_id]["team"].tolist()[0]
+                fdr = self.fdr_data[self.fdr_data["team"] == team][f"gw{gw}"].tolist()[0]
+                if np.isnan(fdr) or player_history_data["gw_points"] == 0:
+                    continue
+                else:
+                    fdr_factor = player_history_data["gw_points"] / fdr
 
-                form_factor = (
-                    (float(self.player_stat(duo[0], "form")))
-                    / (float(self.player_stat(duo[1], "form")))
-                )
-                form_factor_list.append(form_factor)
+                if new_player_num == 1:
+                    new_total_points_factor = total_points_factor
+                    new_ppg_factor = ppg_factor
+                    new_value_factor = value_factor
+                    new_bonus_factor = bonus_factor
+                    new_form_factor = form_factor
+                    new_fdr_factor = fdr_factor
+                else:
+                    new_total_points_factor += (
+                        total_points_factor
+                        * (
+                           factors[gw]["player_num"]
+                           * total_points_factor
+                           - factors[gw]["total_points_factor"]
+                        )
+                        / (
+                           total_points_factor
+                           * factors[gw]["player_num"]
+                           * (factors[gw]["player_num"] + 1)
+                        )
 
-                fdr_factor = (
-                    (float(self.player_stat(duo[0], "fdr_final")))
-                    / (float(self.player_stat(duo[1], "fdr_final")))
-                )
-                fdr_factor_list.append(fdr_factor)
-        avg_point_calculation_factor = abs(np.average(point_calculation_factor_list))
-        avg_total_points_factor = abs(np.average(total_points_factor_list))
-        avg_points_per_game_factor = abs(np.average(points_per_game_factor_list))
-        avg_value_factor = abs(np.average(value_factor_list))
-        avg_bonus_factor = abs(np.average(bonus_factor_list))
-        avg_form_factor = abs(np.average(form_factor_list))
-        avg_fdr_factor = abs(np.average(fdr_factor_list))
-        factor_dict = {
-            "point_calculation_factor": avg_point_calculation_factor,
-            "total_points_factor": avg_total_points_factor,
-            "points_per_game_factor": avg_points_per_game_factor,
-            "value_factor": avg_value_factor,
-            "bonus_factor": avg_bonus_factor,
-            "form_factor": avg_form_factor,
-            "fdr_factor": avg_fdr_factor,
-        }
-        with open("factors.json", "w") as file:
-            json.dump(factor_dict, file, indent=4)
+                    )
+                    new_ppg_factor += (
+                            ppg_factor
+                            * (
+                               factors[gw]["player_num"]
+                               * ppg_factor
+                               - factors[gw]["ppg_factor"]
+                            )
+                            / (
+                               ppg_factor
+                               * factors[gw]["player_num"]
+                               * (factors[gw]["player_num"] + 1)
+                            )
 
-    def factor_point_calculation(self) -> None:
-        """
-        Calculates the factor points
+                    )
+                    new_value_factor += (
+                            value_factor
+                            * (
+                               factors[gw]["player_num"]
+                               * value_factor
+                               - factors[gw]["value_factor"]
+                            )
+                            / (
+                               value_factor
+                               * factors[gw]["player_num"]
+                               * (factors[gw]["player_num"] + 1)
+                            )
 
-        :return: None
-        """
-        self.player_data["factor_point_calculation"] = (
-                self.player_data["total_points"].astype(float)
-                * self.player_data["value_season"].astype(float)
-                * self.player_data["points_per_game"].astype(float)
-                * self.player_data["form"].astype(float)
-                * self.player_data["bonus_new"].astype(float)
-                / self.player_data["fdr_final"].astype(float)
-        )
+                    )
+                    new_bonus_factor += (
+                            bonus_factor
+                            * (
+                               factors[gw]["player_num"]
+                               * bonus_factor
+                               - factors[gw]["bonus_factor"]
+                            )
+                            / (
+                               bonus_factor
+                               * factors[gw]["player_num"]
+                               * (factors[gw]["player_num"] + 1)
+                            )
 
-    def point_calculation(self) -> None:
+                    )
+                    new_form_factor += (
+                            form_factor
+                            * (
+                               factors[gw]["player_num"]
+                               * form_factor
+                               - factors[gw]["form_factor"]
+                            )
+                            / (
+                               form_factor
+                               * factors[gw]["player_num"]
+                               * (factors[gw]["player_num"] + 1)
+                            )
+
+                    )
+                    new_fdr_factor += (
+                            fdr_factor
+                            * (
+                               factors[gw]["player_num"]
+                               * fdr_factor
+                               - factors[gw]["fdr_factor"]
+                            )
+                            / (
+                               fdr_factor
+                               * factors[gw]["player_num"]
+                               * (factors[gw]["player_num"] + 1)
+                            )
+
+                    )
+                new_player_num += 1
+                new_last_date = player_history_data["date"]
+                check_new_last_date = datetime.strptime(player_history_data["date"], "%Y-%m-%dT%H:%M:%SZ")
+
+                factors[gw]["total_points_factor"] = new_total_points_factor
+                factors[gw]["ppg_factor"] = new_ppg_factor
+                factors[gw]["value_factor"] = new_value_factor
+                factors[gw]["bonus_factor"] = new_bonus_factor
+                factors[gw]["form_factor"] = new_form_factor
+                factors[gw]["fdr_factor"] = new_fdr_factor
+                factors[gw]["player_num"] = new_player_num
+                factors[gw]["gw"] = int(gw)
+                if check_new_last_date >= datetime.strptime(factors[gw]["last_date"], "%Y-%m-%dT%H:%M:%SZ"):
+                    factors[gw]["last_date"] = new_last_date
+
+            with open("factors.json", "w") as data:
+                json.dump(factors, data, indent=4)
+
+    def point_calculation(self, first_gw_number: int, last_gw_number: int) -> None:
         """
         Calculates the basic points for player comparison
 
+        :param first_gw_number: An integer of the input of the first GW
+        :type first_gw_number: int
+        :param last_gw_number: An integer of the input of the last GW
+        :type last_gw_number: int
         :return: None
         """
         with open("factors.json", "r") as file:
             factors = json.load(file)
+        factors_average = {
+            "total_points_factor": 0,
+            "ppg_factor": 0,
+            "value_factor": 0,
+            "bonus_factor": 0,
+            "form_factor": 0,
+            "fdr_factor": 0,
+        }
+
+        for gw in range(first_gw_number, last_gw_number + 1):
+            factors_average["total_points_factor"] += factors[str(gw)]["total_points_factor"] / 10
+            factors_average["ppg_factor"] += factors[str(gw)]["ppg_factor"] / 10
+            factors_average["value_factor"] += factors[str(gw)]["value_factor"] / 10
+            factors_average["bonus_factor"] += factors[str(gw)]["bonus_factor"] / 10
+            factors_average["form_factor"] += factors[str(gw)]["form_factor"] / 10
+            factors_average["fdr_factor"] += factors[str(gw)]["fdr_factor"] / 10
+
         self.player_data["point_calculation"] = (
                 self.player_data["total_points"]
-                * factors["total_points_factor"]
+                ** factors_average["total_points_factor"]
                 * self.player_data["value_season"].astype(float)
-                * factors["value_factor"]
+                ** factors_average["value_factor"]
                 * self.player_data["points_per_game"].astype(float)
-                * factors["points_per_game_factor"]
-                * self.player_data["form"].astype(float)
-                * factors["form_factor"]
+                ** factors_average["ppg_factor"]
+                * self.player_data["form_new"].astype(float)
+                ** factors_average["form_factor"]
                 * self.player_data["bonus_new"]
-                * factors["bonus_factor"]
+                ** factors_average["bonus_factor"]
                 / (
                    self.player_data["fdr_final"]
-                   * factors["fdr_factor"]
-                   * factors["point_calculation_factor"]
+                   ** factors_average["fdr_factor"]
                 )
         )
 
-    def captain_points(self) -> None:
+        self.player_data["point_calculation"] = (
+                self.player_data["point_calculation"]
+                * 100
+                / (max(self.player_data["point_calculation"]) + 1)
+        )
+
+    def captain_points(self, first_gw_number: int, last_gw_number: int) -> None:
         """
         Calculates the captaincy points
 
+        :param first_gw_number: An integer of the input of the first GW
+        :type first_gw_number: int
+        :param last_gw_number: An integer of the input of the last GW
+        :type last_gw_number: int
         :return: None
         """
         with open("factors.json", "r") as file:
             factors = json.load(file)
+        factors_average = {
+            "total_points_factor": 0,
+            "ppg_factor": 0,
+            "value_factor": 0,
+            "bonus_factor": 0,
+            "form_factor": 0,
+            "fdr_factor": 0,
+        }
+
+        for gw in range(first_gw_number, last_gw_number + 1):
+            factors_average["total_points_factor"] += factors[str(gw)]["total_points_factor"] / 10
+            factors_average["ppg_factor"] += factors[str(gw)]["ppg_factor"] / 10
+            factors_average["value_factor"] += factors[str(gw)]["value_factor"] / 10
+            factors_average["bonus_factor"] += factors[str(gw)]["bonus_factor"] / 10
+            factors_average["form_factor"] += factors[str(gw)]["form_factor"] / 10
+            factors_average["fdr_factor"] += factors[str(gw)]["fdr_factor"] / 10
+
         self.player_data["captain_points"] = (
-                self.player_data["total_points"] ** 2
-                * factors["total_points_factor"] ** 2
+                self.player_data["total_points"]
+                ** (2 * factors_average["total_points_factor"])
                 * self.player_data["points_per_game"].astype(float)
-                * factors["points_per_game_factor"]
-                * self.player_data["form"].astype(float)
-                * factors["form_factor"]
+                ** factors_average["ppg_factor"]
+                * self.player_data["form_new"].astype(float)
+                ** factors_average["form_factor"]
                 * self.player_data["bonus_new"]
-                * factors["bonus_factor"]
+                ** factors_average["bonus_factor"]
                 / (
                    self.player_data["fdr_final"]
-                   * factors["fdr_factor"]
-                   * factors["point_calculation_factor"]
+                   ** factors_average["fdr_factor"]
                 )
         )
 
-    def transfer_points(self, gw_number: int) -> None:
+        self.player_data["captain_points"] = (
+                self.player_data["captain_points"]
+                * 100
+                / (max(self.player_data["captain_points"]) + 1)
+        )
+
+    def transfer_points(self, gw_number: int, first_gw_number: int, last_gw_number: int) -> None:
         """
         Calculates the transfer points
 
         :param gw_number: An integer of the number of GWs played
         :type gw_number: int
+        :param first_gw_number: An integer of the input of the first GW
+        :type first_gw_number: int
+        :param last_gw_number: An integer of the input of the last GW
+        :type last_gw_number: int
         :return: None
         """
         with open("factors.json", "r") as file:
             factors = json.load(file)
+        factors_average = {
+            "total_points_factor": 0,
+            "ppg_factor": 0,
+            "value_factor": 0,
+            "bonus_factor": 0,
+            "form_factor": 0,
+            "fdr_factor": 0,
+        }
+
+        for gw in range(first_gw_number, last_gw_number + 1):
+            factors_average["total_points_factor"] += factors[str(gw)]["total_points_factor"] / 10
+            factors_average["ppg_factor"] += factors[str(gw)]["ppg_factor"] / 10
+            factors_average["value_factor"] += factors[str(gw)]["value_factor"] / 10
+            factors_average["bonus_factor"] += factors[str(gw)]["bonus_factor"] / 10
+            factors_average["form_factor"] += factors[str(gw)]["form_factor"] / 10
+            factors_average["fdr_factor"] += factors[str(gw)]["fdr_factor"] / 10
+
         self.player_data["transfer_points"] = (
-                np.abs(self.player_data["total_points"] - 4) ** 3
-                * factors["total_points_factor"]
-                * factors["value_factor"]
-                * factors["points_per_game_factor"]
+                np.abs(self.player_data["total_points"] - 4)
+                ** (
+                    factors_average["total_points_factor"]
+                    + factors_average["value_factor"]
+                    + factors_average["ppg_factor"]
+                )
                 * self.player_data["bonus_new"]
-                * factors["bonus_factor"]
+                ** factors_average["bonus_factor"]
                 * (
-                   (self.player_data["form"].astype(float)
-                    * factors["form_factor"])
-                   - (4 / 5.0)
+                   np.abs(self.player_data["form_new"].astype(float) - (4 / 5.0))
+                   ** factors_average["form_factor"]
                 )
                 / (
                    self.player_data["cost"]
+                   ** factors_average["value_factor"]
                    * self.player_data["fdr_final"]
-                   * factors["fdr_factor"]
-                   * factors["point_calculation_factor"]
+                   ** factors_average["fdr_factor"]
                    * gw_number
+                   ** factors_average["ppg_factor"]
                 )
         )
 
-    def manager_points(self) -> None:
+        self.player_data["transfer_points"] = (
+                self.player_data["transfer_points"]
+                * 100
+                / (max(self.player_data["transfer_points"]) + 1)
+        )
+
+    def manager_points(self, first_gw_number: int, last_gw_number: int) -> None:
         """
         Calculates points for manager comparison
 
+        :param first_gw_number: An integer of the input of the first GW
+        :type first_gw_number: int
+        :param last_gw_number: An integer of the input of the last GW
+        :type last_gw_number: int
         :return: None
         """
+        with open("factors.json", "r") as file:
+            factors = json.load(file)
+        factors_average = {
+            "total_points_factor": 0,
+            "ppg_factor": 0,
+            "value_factor": 0,
+            "bonus_factor": 0,
+            "form_factor": 0,
+            "fdr_factor": 0,
+        }
+
+        for gw in range(first_gw_number, last_gw_number + 1):
+            factors_average["total_points_factor"] += factors[str(gw)]["total_points_factor"] / 10
+            factors_average["ppg_factor"] += factors[str(gw)]["ppg_factor"] / 10
+            factors_average["value_factor"] += factors[str(gw)]["value_factor"] / 10
+            factors_average["bonus_factor"] += factors[str(gw)]["bonus_factor"] / 10
+            factors_average["form_factor"] += factors[str(gw)]["form_factor"] / 10
+            factors_average["fdr_factor"] += factors[str(gw)]["fdr_factor"] / 10
+
         self.player_data["manager_points"] = (
-            self.player_data["total_points"] ** 3
-            * self.player_data["form"].astype(float)
+            self.player_data["total_points"]
+            ** (3 * factors_average["total_points_factor"])
+            * self.player_data["form_new"].astype(float)
+            ** factors_average["form_factor"]
             / (
                 self.player_data["fdr_final"]
+                ** factors_average["fdr_factor"]
             )
+        )
+
+        self.player_data["manager_points"] = (
+                self.player_data["manager_points"]
+                * 100
+                / (max(self.player_data["manager_points"]) + 1)
         )
 
 
@@ -363,10 +565,19 @@ def calculate_fdr(first_gw_number: int, last_gw_number: int) -> list:
     return fdr_gw
 
 
-if __name__ == "__main__":
-    fpl = FPLstats()
-    fpl.calculate_points()
+# if __name__ == "__main__":
+    # fpl = FPLstats(username, password)
+    # fpl.calculate_points()
     # print(fpl.fdr_data["gw29"][fpl.fdr_data.index[fpl.fdr_data["team"] == "ARS"].tolist()[0]])
-    # print(fpl.player_stat("Cunha", "factor_point_calculation"))
-    # print(fpl.player_stat("Wissa", "factor_point_calculation"))
-    print(fpl.fdr_data)
+    # print(fpl.player_stat("Cunha", "total_points"))
+    # print(fpl.fdr_data)
+
+    # gw = 33
+    # team = fpl.player_data[fpl.player_data["id_x"] == 17]["team"].tolist()[0]
+    # fdr = fpl.fdr_data[fpl.fdr_data["team"] == team][f"gw{gw}"].tolist()[0]
+    # if np.isnan(fdr):
+    #     print("nope")
+    # else:
+    #     print("yep")
+
+    # fpl.calculation_factors()

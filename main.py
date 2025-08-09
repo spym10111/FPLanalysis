@@ -2,6 +2,7 @@ import requests.exceptions
 
 import fplapi
 from fplteam import FPLteam
+from fplstats import FPLstats
 import time
 import logos
 from getpass import getpass
@@ -27,7 +28,7 @@ def menu() -> None:
         connectivity_delay()
         choice = 6
 
-    while choice not in [1, 2, 3, 4, 5, 6, 7]:
+    while choice not in [1, 2, 3, 4, 5, 6, 7, 8]:
         print("\n\n-------------------------------------Main Menu------------------------------------"
               "-----------------")
         print("\nPlease enter a number from the list below: ")
@@ -37,8 +38,9 @@ def menu() -> None:
         print("\n4. Enter new team: You manually enter your team.")
         print("\n5. Open saved team: Open a previously saved team.")
         print("\n6. Rank players: Ranks the given players.")
-        print("\n7. Log out.")
-        print("\n8. Exit")
+        print("\n7. Update factors: Updating the formula used for calculation.")
+        print("\n8. Log out.")
+        print("\n9. Exit")
 
         choice = pick_menu_number()
         print("")
@@ -46,7 +48,7 @@ def menu() -> None:
             try:
                 print("\n\n-----------------------------------Official Team----------------------------------"
                       "-----------------")
-                fplteam = FPLteam()
+                fplteam = FPLteam(credentials[0], credentials[1])
                 try:
                     # Using log-in information
                     fplteam.open_user_team(credentials[0], credentials[1])
@@ -63,7 +65,7 @@ def menu() -> None:
             try:
                 print("\n\n--------------------------------Free Hit------------------------------------------"
                       "-----------------")
-                fplteam = FPLteam()
+                fplteam = FPLteam(credentials[0], credentials[1])
                 try:
                     # Creates the best Free Hit team
                     fplteam.free_hit(credentials[0], credentials[1])
@@ -80,7 +82,7 @@ def menu() -> None:
             try:
                 print("\n\n----------------------------------New Team (Auto)---------------------------------"
                       "-----------------")
-                fplteam = FPLteam()
+                fplteam = FPLteam(credentials[0], credentials[1])
                 try:
                     # Creating the best team without any inputs
                     fplteam.create_new_team(credentials[0], credentials[1])
@@ -96,7 +98,7 @@ def menu() -> None:
             try:
                 print("\n\n---------------------------------New Team (Manual)--------------------------------"
                       "-----------------")
-                fplteam = FPLteam()
+                fplteam = FPLteam(credentials[0], credentials[1])
                 try:
                     # Creating a new team by entering names
                     fplteam.enter_new_team()
@@ -113,7 +115,7 @@ def menu() -> None:
             try:
                 print("\n\n------------------------------------Saved Team------------------------------------"
                       "-----------------")
-                fplteam = FPLteam()
+                fplteam = FPLteam(credentials[0], credentials[1])
                 try:
                     # Using a previously saved team
                     fplteam.open_saved_team()
@@ -134,7 +136,7 @@ def menu() -> None:
             try:
                 print("\n\n--------------------------------Player Comparison---------------------------------"
                       "-----------------")
-                fplteam = FPLteam()
+                fplteam = FPLteam(credentials[0], credentials[1])
                 try:
                     # Comparing players' captaincy points
                     fplteam.compare_players()
@@ -146,6 +148,21 @@ def menu() -> None:
                 break
         elif choice == 7:
             try:
+                print("\n\n---------------------------------Factors Update-----------------------------------"
+                      "-----------------")
+                print("\nUpdating...")
+                fpl = FPLstats(credentials[0], credentials[1])
+                try:
+                    fpl.calculation_factors()
+                    print("\nUpdate complete.")
+                except ValueError:
+                    choice = 0
+                    continue
+            except NotImplementedError:
+                updating_delay()
+                break
+        elif choice == 8:
+            try:
                 print("\n\n---------------------------------------Login--------------------------------------"
                       "-----------------")
                 # Logging in again
@@ -153,7 +170,7 @@ def menu() -> None:
             except NotImplementedError:
                 updating_delay()
                 break
-        elif choice == 8:
+        elif choice == 9:
             # Exits the program
             print("\n\n---------------------------------------Exit---------------------------------------"
                   "-----------------")
@@ -176,10 +193,10 @@ def pick_menu_number() -> int:
     :return: int
     """
     choice = ""
-    while choice not in [1, 2, 3, 4, 5, 6, 7, 8]:
+    while choice not in [1, 2, 3, 4, 5, 6, 7, 8, 9]:
         try:
             choice = int(input("\n\nEnter number: "))
-            if choice not in [1, 2, 3, 4, 5, 6, 7, 8]:
+            if choice not in [1, 2, 3, 4, 5, 6, 7, 8, 9]:
                 print("\nInvalid number.")
         except ValueError:
             print("\nInvalid number.")
@@ -247,7 +264,7 @@ def log_in() -> list:
             log_in_info = [username, password]
 
             status_raise = False
-        except TypeError:
+        except requests.exceptions.HTTPError:
             print("\nInvalid e-mail or password.")
     return log_in_info
 
