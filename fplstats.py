@@ -148,9 +148,6 @@ class FPLstats:
             with open("factors.json", "r") as data_file:
                 factors = json.load(data_file)
 
-        with open("dist/FPL Analysis/factors.json", "w") as data_dist:
-            json.dump(factors, data_dist, indent=4)
-
         for gw in factors.keys():
             player_id_list = self.player_data["id_x"].tolist()
             player_id_list.sort()
@@ -314,11 +311,6 @@ class FPLstats:
 
             with open("factors.json", "w") as data:
                 json.dump(factors, data, indent=4)
-
-        with open("factors.json", "r") as data_move:
-            factors_move = json.load(data_move)
-        with open("dist/FPL Analysis/factors.json", "w") as data_dist:
-            json.dump(factors_move, data_dist, indent=4)
 
     def point_calculation(self, first_gw_number: int, last_gw_number: int) -> None:
         """
