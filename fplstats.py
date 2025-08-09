@@ -18,9 +18,9 @@ class FPLstats:
         player_data: Calls the method for the official Fantasy Premier League stats
         fdr_data: Calls the method for the official Fantasy Premier League FDR
     """
-    def __init__(self):
+    def __init__(self, username, password):
         # Getting the Dataframes
-        self.fplapi = FPLapi()
+        self.fplapi = FPLapi(username, password)
         self.player_data = self.fplapi.fpl_player_stats()
         self.fdr_data = self.fplapi.fpl_fdr()
         self.last_gw_number = 0
@@ -43,6 +43,7 @@ class FPLstats:
 
         # The functions used for team selection
         self.player_data["bonus_new"] = self.player_data["bonus"] + 1
+        self.player_data["form_new"] = self.player_data["form"].astype(float) + (1/1000)
         # Calculating points for player comparison
         self.point_calculation(fdr_range[0], fdr_range[1])
         # Calculating points for captaincy comparison
@@ -154,6 +155,8 @@ class FPLstats:
                 player_check = fplapi.fpl_player_history(1, int(gw))
             except IndexError:
                 player_check = fplapi.fpl_player_history(100, int(gw))
+            except KeyError:
+                return None
             player_check_date = datetime.strptime(player_check["date"], "%Y-%m-%dT%H:%M:%SZ")
             factors_check_date = datetime.strptime(factors[gw]["last_date"], "%Y-%m-%dT%H:%M:%SZ")
             if (
@@ -182,7 +185,7 @@ class FPLstats:
                     or player_history_data["ppg"] <= 0
                     or player_history_data["value_season"] <= 0
                     or player_history_data["bonus"] <= 0
-                    or player_history_data["form"] <= 0
+                    or player_history_data["form_new"] <= 0
                 ):
                     continue
                 else:
@@ -190,7 +193,7 @@ class FPLstats:
                     ppg_factor = player_history_data["gw_points"] / player_history_data["ppg"]
                     value_factor = player_history_data["gw_points"] / player_history_data["value_season"]
                     bonus_factor = player_history_data["gw_points"] / player_history_data["bonus"]
-                    form_factor = player_history_data["gw_points"] / player_history_data["form"]
+                    form_factor = player_history_data["gw_points"] / player_history_data["form_new"]
 
                 team = self.player_data[self.player_data["id_x"] == player_id]["team"].tolist()[0]
                 fdr = self.fdr_data[self.fdr_data["team"] == team][f"gw{gw}"].tolist()[0]
@@ -345,7 +348,7 @@ class FPLstats:
                 ** factors_average["value_factor"]
                 * self.player_data["points_per_game"].astype(float)
                 ** factors_average["ppg_factor"]
-                * self.player_data["form"].astype(float)
+                * self.player_data["form_new"].astype(float)
                 ** factors_average["form_factor"]
                 * self.player_data["bonus_new"]
                 ** factors_average["bonus_factor"]
@@ -358,7 +361,7 @@ class FPLstats:
         self.player_data["point_calculation"] = (
                 self.player_data["point_calculation"]
                 * 100
-                / max(self.player_data["point_calculation"])
+                / (max(self.player_data["point_calculation"]) + 1)
         )
 
     def captain_points(self, first_gw_number: int, last_gw_number: int) -> None:
@@ -395,7 +398,7 @@ class FPLstats:
                 ** (2 * factors_average["total_points_factor"])
                 * self.player_data["points_per_game"].astype(float)
                 ** factors_average["ppg_factor"]
-                * self.player_data["form"].astype(float)
+                * self.player_data["form_new"].astype(float)
                 ** factors_average["form_factor"]
                 * self.player_data["bonus_new"]
                 ** factors_average["bonus_factor"]
@@ -408,7 +411,7 @@ class FPLstats:
         self.player_data["captain_points"] = (
                 self.player_data["captain_points"]
                 * 100
-                / max(self.player_data["captain_points"])
+                / (max(self.player_data["captain_points"]) + 1)
         )
 
     def transfer_points(self, gw_number: int, first_gw_number: int, last_gw_number: int) -> None:
@@ -452,9 +455,8 @@ class FPLstats:
                 * self.player_data["bonus_new"]
                 ** factors_average["bonus_factor"]
                 * (
-                   (self.player_data["form"].astype(float)
-                    ** factors_average["form_factor"])
-                   - (4 / 5.0)
+                   np.abs(self.player_data["form_new"].astype(float) - (4 / 5.0))
+                   ** factors_average["form_factor"]
                 )
                 / (
                    self.player_data["cost"]
@@ -469,7 +471,7 @@ class FPLstats:
         self.player_data["transfer_points"] = (
                 self.player_data["transfer_points"]
                 * 100
-                / max(self.player_data["transfer_points"])
+                / (max(self.player_data["transfer_points"]) + 1)
         )
 
     def manager_points(self, first_gw_number: int, last_gw_number: int) -> None:
@@ -504,7 +506,7 @@ class FPLstats:
         self.player_data["manager_points"] = (
             self.player_data["total_points"]
             ** (3 * factors_average["total_points_factor"])
-            * self.player_data["form"].astype(float)
+            * self.player_data["form_new"].astype(float)
             ** factors_average["form_factor"]
             / (
                 self.player_data["fdr_final"]
@@ -515,7 +517,7 @@ class FPLstats:
         self.player_data["manager_points"] = (
                 self.player_data["manager_points"]
                 * 100
-                / max(self.player_data["manager_points"])
+                / (max(self.player_data["manager_points"]) + 1)
         )
 
 
@@ -563,12 +565,11 @@ def calculate_fdr(first_gw_number: int, last_gw_number: int) -> list:
     return fdr_gw
 
 
-if __name__ == "__main__":
-    fpl = FPLstats()
+# if __name__ == "__main__":
+    # fpl = FPLstats(username, password)
     # fpl.calculate_points()
     # print(fpl.fdr_data["gw29"][fpl.fdr_data.index[fpl.fdr_data["team"] == "ARS"].tolist()[0]])
-    # print(fpl.player_stat("Cunha", "factor_point_calculation"))
-    # print(fpl.player_stat("Wissa", "factor_point_calculation"))
+    # print(fpl.player_stat("Cunha", "total_points"))
     # print(fpl.fdr_data)
 
     # gw = 33
@@ -579,4 +580,4 @@ if __name__ == "__main__":
     # else:
     #     print("yep")
 
-    fpl.calculation_factors()
+    # fpl.calculation_factors()

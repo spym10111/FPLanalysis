@@ -2,6 +2,7 @@ import requests
 import numpy as np
 import pandas as pd
 from functools import cache
+from apilogin import Login
 
 TOTAL_GW_NUMBER = 38
 
@@ -16,8 +17,9 @@ class FPLapi:
         fixtures_df: The dataframe containing the info on the FDR per team
         team_id: The teams id we get after entering the log-in information
     """
-    def __init__(self):
-        self.team_id = 0
+    def __init__(self, username, password):
+        self.apilogin = Login(username, password)
+        self.team_id = self.apilogin.team_id
 
         pd.set_option("display.max_columns", None)
         self.main_df = self.fpl_player_stats()
@@ -133,36 +135,20 @@ class FPLapi:
         return self.fixtures_df
 
     @cache
-    def get_team(self, username: str, password: str) -> dict:
+    def get_team(self, username, password) -> dict:
         """
         Gets information from the player's team id
 
-        :param username: E-mail used for request on the FPL API
-        :type username: str
-        :param password: Password used for request on the FPL API
-        :type password: str
         :return: A dictionary containing information on the user's FPL team
         """
-        session = requests.session()
-        url = "https://users.premierleague.com/accounts/login/"
-        payload = {
-            "password": password,
-            "login": username,
-            "redirect_uri": "https://fantasy.premierleague.com/a/login",
-            "app": "plfpl-web"
-        }
-        headers = {
-            "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:130.0) Gecko/20100101 Firefox/130.0",
-            "accept-language": "en-US,en;q=0.5"
-        }
-        session.post(url, data=payload, headers=headers, verify=True)
+        session = requests.Session()
 
-        response = session.get("https://fantasy.premierleague.com/api/me/", verify=True)
-        response.raise_for_status()
-        response_json = response.json()
-        self.team_id = response_json["player"]["entry"]
-
-        response_team = session.get(f"https://fantasy.premierleague.com/api/my-team/{self.team_id}")
+        response_team = session.get(
+            f"https://fantasy.premierleague.com/api/my-team/{self.team_id}",
+            headers={
+                "X-API-Authorization": f"Bearer {FPLapi(username, password).apilogin.access_token}",
+            }
+        )
         response_team_json = response_team.json()
         picks = pd.json_normalize(response_team_json["picks"])
         transfers = pd.json_normalize(response_team_json["transfers"])
@@ -251,26 +237,14 @@ def check_status(username: str, password: str) -> None:
     :type password: str
     :return: None
     """
-    session = requests.session()
-    url = "https://users.premierleague.com/accounts/login/"
-    payload = {
-        "password": password,
-        "login": username,
-        "redirect_uri": "https://fantasy.premierleague.com/a/login",
-        "app": "plfpl-web"
-    }
-    headers = {
-        "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:130.0) Gecko/20100101 Firefox/130.0",
-        "accept-language": "en-US,en;q=0.5"
-    }
-    session.post(url, data=payload, headers=headers, verify=True)
+    session = requests.Session()
 
-    response = session.get("https://fantasy.premierleague.com/api/me/", verify=True)
-    response.raise_for_status()
-    response_json = response.json()
-    team_id = response_json["player"]["entry"]
-
-    response_team = session.get(f"https://fantasy.premierleague.com/api/my-team/{team_id}")
+    response_team = session.get(
+        f"https://fantasy.premierleague.com/api/my-team/{FPLapi(username, password).team_id}",
+        headers={
+            "X-API-Authorization": f"Bearer {FPLapi(username, password).apilogin.access_token}",
+        }
+    )
     response_team.raise_for_status()
 
 
@@ -290,9 +264,13 @@ def gw_played() -> int:
     for n in events["id"]:
         if events["finished"].tolist()[n-1]:
             last_gw = n
+    if last_gw == 0:
+        last_gw = 1
     return last_gw
 
 
-if __name__ == "__main__":
-    print(fpl_player_history(17, 33))
-    # print(FPLapi().fpl_player_stats())
+# if __name__ == "__main__":
+    # print(fpl_player_history(17, 33))
+    # print(FPLapi(username, password).fpl_player_stats())
+    # print(FPLapi(username, password).fpl_fdr())
+    # print(gw_played())

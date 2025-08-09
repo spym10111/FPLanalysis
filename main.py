@@ -48,7 +48,7 @@ def menu() -> None:
             try:
                 print("\n\n-----------------------------------Official Team----------------------------------"
                       "-----------------")
-                fplteam = FPLteam()
+                fplteam = FPLteam(credentials[0], credentials[1])
                 try:
                     # Using log-in information
                     fplteam.open_user_team(credentials[0], credentials[1])
@@ -65,7 +65,7 @@ def menu() -> None:
             try:
                 print("\n\n--------------------------------Free Hit------------------------------------------"
                       "-----------------")
-                fplteam = FPLteam()
+                fplteam = FPLteam(credentials[0], credentials[1])
                 try:
                     # Creates the best Free Hit team
                     fplteam.free_hit(credentials[0], credentials[1])
@@ -82,7 +82,7 @@ def menu() -> None:
             try:
                 print("\n\n----------------------------------New Team (Auto)---------------------------------"
                       "-----------------")
-                fplteam = FPLteam()
+                fplteam = FPLteam(credentials[0], credentials[1])
                 try:
                     # Creating the best team without any inputs
                     fplteam.create_new_team(credentials[0], credentials[1])
@@ -98,7 +98,7 @@ def menu() -> None:
             try:
                 print("\n\n---------------------------------New Team (Manual)--------------------------------"
                       "-----------------")
-                fplteam = FPLteam()
+                fplteam = FPLteam(credentials[0], credentials[1])
                 try:
                     # Creating a new team by entering names
                     fplteam.enter_new_team()
@@ -115,7 +115,7 @@ def menu() -> None:
             try:
                 print("\n\n------------------------------------Saved Team------------------------------------"
                       "-----------------")
-                fplteam = FPLteam()
+                fplteam = FPLteam(credentials[0], credentials[1])
                 try:
                     # Using a previously saved team
                     fplteam.open_saved_team()
@@ -136,7 +136,7 @@ def menu() -> None:
             try:
                 print("\n\n--------------------------------Player Comparison---------------------------------"
                       "-----------------")
-                fplteam = FPLteam()
+                fplteam = FPLteam(credentials[0], credentials[1])
                 try:
                     # Comparing players' captaincy points
                     fplteam.compare_players()
@@ -151,7 +151,7 @@ def menu() -> None:
                 print("\n\n---------------------------------Factors Update-----------------------------------"
                       "-----------------")
                 print("\nUpdating...")
-                fpl = FPLstats()
+                fpl = FPLstats(credentials[0], credentials[1])
                 try:
                     fpl.calculation_factors()
                     print("\nUpdate complete.")
@@ -264,7 +264,7 @@ def log_in() -> list:
             log_in_info = [username, password]
 
             status_raise = False
-        except TypeError:
+        except requests.exceptions.HTTPError:
             print("\nInvalid e-mail or password.")
     return log_in_info
 
