@@ -121,6 +121,28 @@ class Login:
             },
         )
         response.raise_for_status()
+        response_json = response.json()
+
+        response = session.post(
+            f"https://account.premierleague.com/davinci/connections/{response_json['connectionId']}/"
+            f"capabilities/customHTMLTemplate",  # need to use new connectionId from prev response
+            headers=headers,
+            json={
+                "id": response_json["id"],
+                "nextEvent": {
+                    "constructType": "skEvent",
+                    "eventName": "continue",
+                    "params": [],
+                    "eventType": "post",
+                    "postProcess": {},
+                },
+                "parameters": {
+                    "buttonType": "form-submit",
+                    "buttonValue": "SIGNON",
+                },
+                "eventName": "continue",
+            },
+        )
         dv_response = response.json()["dvResponse"]
 
         # Resume
