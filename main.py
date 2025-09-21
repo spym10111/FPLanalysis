@@ -155,6 +155,10 @@ def menu() -> None:
                 try:
                     fpl.calculation_factors()
                     print("\nUpdate complete.")
+                except IndexError:
+                    choice = 0
+                    print("\nUpdate complete.")
+                    continue
                 except ValueError:
                     choice = 0
                     continue
@@ -242,7 +246,7 @@ def log_in() -> list:
 
             status_raise = False
         except requests.exceptions.HTTPError:
-            print("Invalid e-mail or password.")
+            print("Invalid e-mail or password (You can't log in while the official game is updating.)")
     return log_in_info
 
 

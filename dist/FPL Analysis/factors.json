@@ -1,36 +1,36 @@
 {
     "1": {
-        "total_points_factor": 5.000812645088325,
-        "ppg_factor": 5.000812645088325,
-        "value_factor": 29.339021109291245,
-        "bonus_factor": 14.558383908682028,
-        "form_factor": 5.000812645088325,
-        "fdr_factor": 7.10252166209695,
-        "player_num": 290,
+        "total_points_factor": 5.66848691878641,
+        "ppg_factor": 5.66848691878641,
+        "value_factor": 33.13757264760485,
+        "bonus_factor": 16.398124963648037,
+        "form_factor": 5.66848691878641,
+        "fdr_factor": 7.90759221404346,
+        "player_num": 571,
         "gw": 1,
-        "last_date": "2024-08-19T19:00:00Z"
+        "last_date": "2025-08-18T19:00:00Z"
     },
     "2": {
-        "total_points_factor": 2.6903985552670977,
-        "ppg_factor": 5.380797110534195,
-        "value_factor": 15.219322585386902,
-        "bonus_factor": 6.406624941448995,
-        "form_factor": 5.380797110534195,
-        "fdr_factor": 6.015239148791362,
-        "player_num": 293,
+        "total_points_factor": 3.083044019864087,
+        "ppg_factor": 6.166088039728174,
+        "value_factor": 17.361790402974844,
+        "bonus_factor": 7.262256864949435,
+        "form_factor": 6.166088039728174,
+        "fdr_factor": 6.867450307981027,
+        "player_num": 586,
         "gw": 2,
-        "last_date": "2024-08-25T15:30:00Z"
+        "last_date": "2025-08-25T19:00:00Z"
     },
     "3": {
-        "total_points_factor": 1.5980738163607253,
-        "ppg_factor": 4.80167977638314,
-        "value_factor": 8.824512246657394,
-        "bonus_factor": 3.117581549632582,
-        "form_factor": 4.80167977638314,
-        "fdr_factor": 6.123859938204512,
-        "player_num": 288,
+        "total_points_factor": 1.8868373300383388,
+        "ppg_factor": 5.679009686296043,
+        "value_factor": 10.37487122623202,
+        "bonus_factor": 3.711464451613297,
+        "form_factor": 5.679009686296043,
+        "fdr_factor": 6.87127452543178,
+        "player_num": 580,
         "gw": 3,
-        "last_date": "2024-09-01T15:00:00Z"
+        "last_date": "2025-08-31T18:00:00Z"
     },
     "4": {
         "total_points_factor": 2.42785952423155,

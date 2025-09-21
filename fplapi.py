@@ -3,6 +3,7 @@ import numpy as np
 import pandas as pd
 from functools import cache
 from apilogin import Login
+from datetime import datetime
 
 TOTAL_GW_NUMBER = 38
 
@@ -198,33 +199,46 @@ def fpl_player_history(player_id: int, fixture: int) -> dict:
     r = requests.get(f"{base_url}element-summary/{player_id}", verify=True).json()
     history = pd.json_normalize(r["history"])
 
-    date = history[history["round"] == fixture]["kickoff_time"].tolist()[0]
-    gw = history[history["round"] == fixture]["round"].tolist()[0]
-    fixture_points = history[history["round"] == fixture]["total_points"].sum()
-    total_points = history[history["round"] <= fixture]["total_points"].sum()
-    points_per_game = total_points / fixture
-    form = 0
-    if fixture <= 5:
-        form = total_points / fixture
-    elif fixture > 5:
-        form_points = history[(history["round"] <= fixture)
-                              & (history["round"] > fixture - 5)]["total_points"].sum()
-        form = form_points / 5
-    cost = history[history["round"] == fixture]["value"].tolist()[0] / 10
-    value_season = total_points / cost
-    bonus = history[history["round"] <= fixture]["bonus"].sum() + fixture
+    try:
+        date = history[history["round"] == fixture]["kickoff_time"].tolist()[0]
+        gw = history[history["round"] == fixture]["round"].tolist()[0]
+        fixture_points = history[history["round"] == fixture]["total_points"].sum()
+        total_points = history[history["round"] <= fixture]["total_points"].sum()
+        points_per_game = total_points / fixture
+        form = 0
+        if fixture <= 5:
+            form = total_points / fixture
+        elif fixture > 5:
+            form_points = history[(history["round"] <= fixture)
+                                  & (history["round"] > fixture - 5)]["total_points"].sum()
+            form = form_points / 5
+        cost = history[history["round"] == fixture]["value"].tolist()[0] / 10
+        value_season = total_points / cost
+        bonus = history[history["round"] <= fixture]["bonus"].sum() + fixture
 
-    player_history_stats = {
-        "id": history["element"][0],
-        "date": date,
-        "gw": gw,
-        "gw_points": fixture_points,
-        "total_points": round(total_points, 1),
-        "ppg": round(points_per_game, 1),
-        "form": round(form, 1),
-        "value_season": round(value_season, 1),
-        "bonus": round(bonus, 1),
-    }
+        player_history_stats = {
+            "id": history["element"][0],
+            "date": date,
+            "gw": gw,
+            "gw_points": fixture_points,
+            "total_points": round(total_points, 1),
+            "ppg": round(points_per_game, 1),
+            "form": round(form, 1),
+            "value_season": round(value_season, 1),
+            "bonus": round(bonus, 1),
+        }
+    except KeyError:
+        player_history_stats = {
+            "id": player_id,
+            "date": datetime.min,
+            "gw": 0,
+            "gw_points": 0,
+            "total_points": 0,
+            "ppg": 0,
+            "form": 0,
+            "value_season": 0,
+            "bonus": 0,
+        }
 
     return player_history_stats
 
@@ -273,7 +287,7 @@ def gw_played() -> int:
 
 
 # if __name__ == "__main__":
-    # print(fpl_player_history(17, 33))
+#     print(fpl_player_history(713, 1))
     # print(FPLapi(username, password).fpl_player_stats())
     # print(FPLapi(username, password).fpl_fdr())
     # print(gw_played())

@@ -185,7 +185,7 @@ class FPLstats:
                     or player_history_data["ppg"] <= 0
                     or player_history_data["value_season"] <= 0
                     or player_history_data["bonus"] <= 0
-                    or player_history_data["form_new"] <= 0
+                    or player_history_data["form"] <= 0
                 ):
                     continue
                 else:
@@ -193,7 +193,7 @@ class FPLstats:
                     ppg_factor = player_history_data["gw_points"] / player_history_data["ppg"]
                     value_factor = player_history_data["gw_points"] / player_history_data["value_season"]
                     bonus_factor = player_history_data["gw_points"] / player_history_data["bonus"]
-                    form_factor = player_history_data["gw_points"] / player_history_data["form_new"]
+                    form_factor = player_history_data["gw_points"] / player_history_data["form"]
 
                 team = self.player_data[self.player_data["id_x"] == player_id]["team"].tolist()[0]
                 fdr = self.fdr_data[self.fdr_data["team"] == team][f"gw{gw}"].tolist()[0]
@@ -566,10 +566,10 @@ def calculate_fdr(first_gw_number: int, last_gw_number: int) -> list:
 
 
 # if __name__ == "__main__":
-    # fpl = FPLstats(username, password)
+    # fpl = FPLstats("username", "password")
     # fpl.calculate_points()
     # print(fpl.fdr_data["gw29"][fpl.fdr_data.index[fpl.fdr_data["team"] == "ARS"].tolist()[0]])
-    # print(fpl.player_stat("Cunha", "total_points"))
+    # print(fpl.player_stat("Johnson", "total_points"))
     # print(fpl.fdr_data)
 
     # gw = 33
