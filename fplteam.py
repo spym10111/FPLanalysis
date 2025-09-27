@@ -240,34 +240,43 @@ class FPLteam:
               "\nPlease type 'stop' when you are done entering player names.\n")
         comparing_players_dict = {}
         add_player = ""
-        invalid = False
+        points_list = []
         while add_player != "stop":
             add_player = input("Give a player's name: ")
+            invalid = True
             if add_player == "stop":
                 break
-            for player in self.fpl.player_data["name"]:
+            for code in self.fpl.player_data["code"]:
+                player = (
+                    self.fpl.player_data["name"]
+                    [self.fpl.player_data.index[self.fpl.player_data["code"] == code].tolist()[0]]
+                )
                 if unidecode(player.lower()) == unidecode(add_player.lower()):
-                    comparing_players_dict.update({player: self.fpl.player_stat(player, "captain_points")})
+                    comparing_players_dict.update({code: {player: (
+                        self.fpl.player_data["captain_points"]
+                        [self.fpl.player_data.index[self.fpl.player_data["code"] == code].tolist()[0]]
+                    )}})
                     invalid = False
-                    break
-                else:
-                    invalid = True
             if invalid:
                 print("\nInvalid player name.")
-        points_list = list(comparing_players_dict.values())
+        dict_list = list(comparing_players_dict.values())
+        for player_dict in dict_list:
+            points_list.append(list(player_dict.values())[0])
         points_list.sort(reverse=True)
         sorted_comparing_players_dict = {}
         for number in points_list:
-            for name, points in comparing_players_dict.items():
-                if number == points:
-                    sorted_comparing_players_dict.update({name: points})
+            for code in comparing_players_dict:
+                for name, points in comparing_players_dict[code].items():
+                    if number == points:
+                        sorted_comparing_players_dict.update({code: {name: points}})
         if len(comparing_players_dict) == 0:
             print("")
         else:
             print("\n   Name\t\t\tCaptaincy Points")
-            for player in sorted_comparing_players_dict.keys():
-                print(f"{points_list.index(sorted_comparing_players_dict[player]) + 1}. {player:21}"
-                      f"{round(sorted_comparing_players_dict[player], 2)}")
+            for code in sorted_comparing_players_dict.keys():
+                for player in sorted_comparing_players_dict[code].keys():
+                    print(f"{points_list.index(sorted_comparing_players_dict[code][player]) + 1}. {player:21}"
+                          f"{round(sorted_comparing_players_dict[code][player], 2)}")
 
     def change_players(self, mode: str) -> None:
         """

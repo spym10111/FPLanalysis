@@ -277,3 +277,5 @@ def gw_played() -> int:
     # print(FPLapi(username, password).fpl_player_stats())
     # print(FPLapi(username, password).fpl_fdr())
     # print(gw_played())
+    # print(FPLapi(username, password).get_team(username, password))
+    # print(FPLapi(username, password).fpl_player_stats())
