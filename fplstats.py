@@ -56,19 +56,19 @@ class FPLstats:
         self.player_data.sort_values(by=["point_calculation", "points_per_game"], ascending=False)
 
     @cache
-    def player_stat(self, player_name: str, statistic_value: str):
+    def player_stat(self, player_element: str, statistic_value: str):
         """
         Returns a specific player's stat
 
-        :param player_name: Name of the player
-        :type player_name: str
+        :param player_element: Player ID
+        :type player_element: str
         :param statistic_value: Type of stat returned
         :type statistic_value: str
         :return: A specific stat for a specific player
         """
         return (
             self.player_data[statistic_value]
-            [self.player_data.index[self.player_data["name"] == player_name].tolist()[0]]
+            [self.player_data.index[self.player_data["id_x"] == player_element].tolist()[0]]
         )
 
     def fdr_product(self, fdr_gw: list) -> None:

@@ -34,6 +34,7 @@ class FPLteam:
         self.fpl = FPLstats(username, password)
 
         self.team = []
+        self.team_elements = []
         self.team_positions = []
         self.player_teams = []
         self.managers = []
@@ -49,18 +50,19 @@ class FPLteam:
         self.changes_prices = []
         self.managers_prices = []
         self.unavailable_players_list = []
+        self.unavailable_players_list_elements = []
         self.system = [9999, 9999, 9999]
 
         self.fpl.calculate_points()
 
-    def add_player(self, player: str, mode: str) -> None:
+    def add_player(self, mode: str, element: str) -> None:
         """
         Adds a player's statistics to the team lists
 
-        :param player: Name of the player
-        :type player: str
         :param mode: Option between 'normal' and 'free_hit' that determines the type of update
         :type mode: str
+        :param element: Player ID
+        :type element: str
         :return: None
         """
         calculation_mode = ""
@@ -68,23 +70,24 @@ class FPLteam:
             calculation_mode = "point_calculation"
         elif mode == "free_hit":
             calculation_mode = "captain_points"
-        self.team_positions.append(self.fpl.player_stat(player, "position"))
-        self.team.append(player)
-        self.points_sum += self.fpl.player_stat(player, calculation_mode)
-        self.player_teams.append(self.fpl.player_stat(player, "team"))
-        self.starters_budget += round(self.fpl.player_stat(player, "cost"), 1)
-        self.bank_budget -= round(self.fpl.player_stat(player, "cost"), 1)
-        self.player_points.append(self.fpl.player_stat(player, calculation_mode))
-        self.captain_points.append(self.fpl.player_stat(player, "captain_points"))
+        self.team_positions.append(self.fpl.player_stat(element, "position"))
+        self.team.append(self.fpl.player_stat(element, "name"))
+        self.points_sum += self.fpl.player_stat(element, calculation_mode)
+        self.player_teams.append(self.fpl.player_stat(element, "team"))
+        self.starters_budget += round(self.fpl.player_stat(element, "cost"), 1)
+        self.bank_budget -= round(self.fpl.player_stat(element, "cost"), 1)
+        self.player_points.append(self.fpl.player_stat(element, calculation_mode))
+        self.captain_points.append(self.fpl.player_stat(element, "captain_points"))
+        self.team_elements.append(element)
 
-    def remove_player(self, player: str, mode: str) -> None:
+    def remove_player(self, mode: str, element: str) -> None:
         """
         Removes a player's statistics from the lists
 
-        :param player: Name of the player
-        :type player: str
         :param mode: Option between 'normal' and 'free_hit' that determines the type of update
         :type mode: str
+        :param element: Player ID
+        :type element: str
         :return: None
         """
         calculation_mode = ""
@@ -92,14 +95,15 @@ class FPLteam:
             calculation_mode = "point_calculation"
         elif mode == "free_hit":
             calculation_mode = "captain_points"
-        self.team_positions.pop(self.team.index(player))
-        self.points_sum -= self.fpl.player_stat(player, calculation_mode)
-        self.player_teams.pop(self.team.index(player))
-        self.starters_budget -= round(self.fpl.player_stat(player, "cost"), 1)
-        self.bank_budget += round(self.fpl.player_stat(player, "cost"), 1)
-        self.player_points.pop(self.team.index(player))
-        self.captain_points.pop(self.team.index(player))
-        self.team.remove(player)
+        self.team_positions.pop(self.team.index(self.fpl.player_stat(element, "name")))
+        self.points_sum -= self.fpl.player_stat(element, calculation_mode)
+        self.player_teams.pop(self.team.index(self.fpl.player_stat(element, "name")))
+        self.starters_budget -= round(self.fpl.player_stat(element, "cost"), 1)
+        self.bank_budget += round(self.fpl.player_stat(element, "cost"), 1)
+        self.player_points.pop(self.team.index(self.fpl.player_stat(element, "name")))
+        self.captain_points.pop(self.team.index(self.fpl.player_stat(element, "name")))
+        self.team.remove(self.fpl.player_stat(element, "name"))
+        self.team_elements.remove(element)
 
     def reset_info(self) -> None:
         """
@@ -108,6 +112,7 @@ class FPLteam:
         :return: None
         """
         self.team = []
+        self.team_elements = []
         self.team_positions = []
         self.player_teams = []
         self.managers = []
@@ -123,6 +128,7 @@ class FPLteam:
         self.changes_prices = []
         self.managers_prices = []
         self.unavailable_players_list = []
+        self.unavailable_players_list_elements = []
         self.system = [9999, 9999, 9999]
 
     def print_result(self) -> None:
@@ -164,8 +170,8 @@ class FPLteam:
 
         self.create_loop_players(mode="normal")
         self.update_team(mode="normal")
-        for player in self.team:
-            self.starters_prices.append(self.fpl.player_stat(player, "cost"))
+        for element in self.team_elements:
+            self.starters_prices.append(self.fpl.player_stat(element, "cost"))
 
     def free_hit(self, username, password) -> None:
         """
@@ -287,46 +293,46 @@ class FPLteam:
         :return: None
         """
         # Values that are going to be checked from the team
-        changing_players = []
-        final_changing_players = []
+        changing_players_elements = []
+        final_changing_players_elements = []
         temp_teams = [team for team in self.player_teams]
         temp_teams_change = []
         max_budget = []
-        used_players = []
+        used_players_elements = []
 
         player_budget = self.bank_budget
-        for player in self.team:
-            if player in self.unavailable_players_list:
-                changing_players.append(player)
-                final_changing_players.append(player)
-                temp_teams_change.append(self.fpl.player_stat(player, "team"))
-                player_budget += self.fpl.player_stat(player, "cost")
+        for element in self.team_elements:
+            if element in self.unavailable_players_list_elements:
+                changing_players_elements.append(element)
+                final_changing_players_elements.append(element)
+                temp_teams_change.append(self.fpl.player_stat(element, "team"))
+                player_budget += self.fpl.player_stat(element, "cost")
         max_budget.append(round(player_budget, 1))
 
         # Main process
         all_teams = self.pl_all_teams()
         for n in range(11):
             # Loop again and retry used players
-            self.retry_players(all_teams, used_players)
+            self.retry_players(all_teams, used_players_elements)
             for i in range(11):
                 # Loop again and retry all players
                 # (basically try the players that might have been suitable before the change by looping again)
-                for team_player in changing_players:
-                    if team_player in self.team or team_player in used_players:
+                for player_element in changing_players_elements:
+                    if player_element in self.team_elements or player_element in used_players_elements:
                         # First check replacing players without checking points just to remove them
                         self.change_players_first_loop(
-                            used_players, changing_players, team_player, max_budget, temp_teams, temp_teams_change,
-                            mode=mode
+                            used_players_elements, changing_players_elements, player_element, max_budget,
+                            temp_teams, temp_teams_change, mode=mode
                         )
                     else:
                         self.change_players_more_loops(
-                            used_players, changing_players, team_player, max_budget, temp_teams, temp_teams_change,
-                            mode=mode
+                            used_players_elements, changing_players_elements, player_element, max_budget,
+                            temp_teams, temp_teams_change, mode=mode
                         )
-        for team_player in changing_players:
-            self.add_player(team_player, mode="normal")
-        for player in final_changing_players:
-            self.remove_player(player, mode="normal")
+        for player_element in changing_players_elements:
+            self.add_player(mode="normal", element=player_element)
+        for element in final_changing_players_elements:
+            self.remove_player(mode="normal", element=element)
         self.print_result()
 
     def update_team(self, mode: str) -> None:
@@ -339,21 +345,24 @@ class FPLteam:
         """
         all_teams = self.pl_all_teams()
 
-        used_players = []
+        used_players_elements = []
         max_budget = round(self.total_budget - self.changes_budget, 1)
 
         for n in range(11):
             # Loop again and retry used players
-            self.retry_players(all_teams, used_players)
+            self.retry_players(all_teams, used_players_elements)
             for i in range(11):
                 # Loop again and retry all players
                 # (basically try the players that might have been suitable before the change by looping again)
-                for team_player in self.team:
-                    if team_player in self.unavailable_players_list or team_player in used_players:
+                for player_element in self.team_elements:
+                    if (
+                        player_element in self.unavailable_players_list_elements
+                        or player_element in used_players_elements
+                    ):
                         # First check replacing players without checking points just to remove them
-                        self.update_team_first_loop(used_players, team_player, max_budget, mode)
+                        self.update_team_first_loop(used_players_elements, player_element, max_budget, mode)
                     else:
-                        self.update_team_more_loops(used_players, team_player, max_budget, mode)
+                        self.update_team_more_loops(used_players_elements, player_element, max_budget, mode)
         self.print_result()
 
     def transfer_players(self, mode: str) -> None:
@@ -399,9 +408,9 @@ class FPLteam:
                 break
             if unavailable_player.lower() == "cancel":
                 raise ValueError
-            for player in self.team:
-                if unavailable_player.lower() == "all" and player not in self.unavailable_players_list:
-                    self.unavailable_players_list.append(player)
+            for pl_element in self.team_elements:
+                if unavailable_player.lower() == "all" and pl_element not in self.unavailable_players_list_elements:
+                    self.unavailable_players_list_elements.append(pl_element)
             if unavailable_player.lower() == "update":
                 self.update_team(mode=mode)
                 self.transfer_players(mode=mode)
@@ -410,16 +419,16 @@ class FPLteam:
                 self.transfer_calculation(mode=mode)
                 self.transfer_players(mode=mode)
                 return None
-            for name in self.fpl.player_data["name"]:
-                if unidecode(unavailable_player.lower()) == unidecode(self.fpl.player_stat(name, "name").lower()):
-                    if name not in self.unavailable_players_list:
-                        self.unavailable_players_list.append(name)
+            for element in self.fpl.player_data["id_x"]:
+                if unidecode(unavailable_player.lower()) == unidecode(self.fpl.player_stat(element, "name").lower()):
+                    if element not in self.unavailable_players_list_elements:
+                        self.unavailable_players_list_elements.append(element)
                         break
                     else:
                         print("\nThe player is already excluded.")
-            for name in self.fpl.player_data["name"]:
+            for element in self.fpl.player_data["id_x"]:
                 if (
-                    unidecode(unavailable_player.lower()) != unidecode(self.fpl.player_stat(name, "name").lower())
+                    unidecode(unavailable_player.lower()) != unidecode(self.fpl.player_stat(element, "name").lower())
                     and unavailable_player.lower() != "all"
                     and unavailable_player.lower() != "update"
                     and unavailable_player.lower() != "suggestion"
@@ -429,6 +438,9 @@ class FPLteam:
                     invalid_check.append(0)
             if 0 not in invalid_check:
                 print("\nInvalid answer.")
+            for element in self.unavailable_players_list_elements:
+                if self.fpl.player_stat(element, "name") not in self.unavailable_players_list:
+                    self.unavailable_players_list.append(self.fpl.player_stat(element, "name"))
             print(f"Excluded players: {self.unavailable_players_list}")
 
         # Replacement part
@@ -615,25 +627,25 @@ class FPLteam:
         :type mode: str
         :return: None
         """
-        for name in self.fpl.player_data["name"]:
+        for element in self.fpl.player_data["id_x"]:
             if (
                 # Check team limit
-                self.player_teams.count(self.fpl.player_stat(name, "team")) > 2
+                self.player_teams.count(self.fpl.player_stat(element, "team")) > 2
                 # Check managers out
-                or self.fpl.player_stat(name, "position") == "MNG"
+                or self.fpl.player_stat(element, "position") == "MNG"
                 # Check position limit
-                or (self.fpl.player_stat(name, "position") == "GKP"
+                or (self.fpl.player_stat(element, "position") == "GKP"
                     and self.team_positions.count("GKP") == 1)
-                or (self.fpl.player_stat(name, "position") == "DEF"
+                or (self.fpl.player_stat(element, "position") == "DEF"
                     and self.team_positions.count("DEF") == self.system[0])
-                or (self.fpl.player_stat(name, "position") == "MID"
+                or (self.fpl.player_stat(element, "position") == "MID"
                     and self.team_positions.count("MID") == self.system[1])
-                or (self.fpl.player_stat(name, "position") == "FWD"
+                or (self.fpl.player_stat(element, "position") == "FWD"
                     and self.team_positions.count("FWD") == self.system[2])
             ):
                 continue
             else:
-                self.add_player(name, mode=mode)
+                self.add_player(mode=mode, element=element)
 
     def enter_loop_players(self, team_player: str, budget_choice: str, player_price: float) -> None:
         """
@@ -649,23 +661,27 @@ class FPLteam:
         :return: None
         """
         invalid = False
-        for player in self.fpl.player_data["name"]:
+        for element in self.fpl.player_data["id_x"]:
+            player = (
+                self.fpl.player_data["name"]
+                [self.fpl.player_data.index[self.fpl.player_data["id_x"] == element].tolist()[0]]
+            )
             if (
                 # Check if the player exists
                 unidecode(player.lower()) == unidecode(team_player.lower())
                 # Check if the player is already in the team
                 and player not in self.team
                 # Check team limit
-                and self.player_teams.count(self.fpl.player_stat(player, "team")) < 3
+                and self.player_teams.count(self.fpl.player_stat(element, "team")) < 3
                 # Check position limit
                 and (
-                     self.fpl.player_stat(player, "position") == "GKP"
+                     self.fpl.player_stat(element, "position") == "GKP"
                      and self.team_positions.count("GKP") < 1
-                     or self.fpl.player_stat(player, "position") == "DEF"
+                     or self.fpl.player_stat(element, "position") == "DEF"
                      and self.team_positions.count("DEF") < self.system[0]
-                     or self.fpl.player_stat(player, "position") == "MID"
+                     or self.fpl.player_stat(element, "position") == "MID"
                      and self.team_positions.count("MID") < self.system[1]
-                     or self.fpl.player_stat(player, "position") == "FWD"
+                     or self.fpl.player_stat(element, "position") == "FWD"
                      and self.team_positions.count("FWD") < self.system[2]
                 )
             ):
@@ -677,10 +693,10 @@ class FPLteam:
                 # (a bit of cheating someone might say... *sips tea sardonically*)
                 if budget_choice.lower() == "yes":
                     self.fpl.fplapi.main_df.loc[self.fpl.fplapi.main_df.index[
-                        self.fpl.fplapi.main_df["name"] == player], ["cost"]
+                        self.fpl.fplapi.main_df["id_x"] == element], ["cost"]
                     ] = player_price
                     self.starters_prices.append(player_price)
-                self.add_player(player, mode="normal")
+                self.add_player(mode="normal", element=element)
                 invalid = False
                 break
             else:
@@ -758,12 +774,12 @@ class FPLteam:
         # info of the main_df is stored in the cache and the fpl_player_stats function
         # just calls the result from there without running again
         # (a bit of cheating someone might say... *sips tea sardonically*)
-        for player in saved_team[username]["Team"]:
+        for element in saved_team[username]["Team_elements"]:
             self.fpl.fplapi.main_df.loc[self.fpl.fplapi.main_df.index[
-                self.fpl.fplapi.main_df["name"] == player], ["cost"]] = saved_team[username]["Starters_prices"][
-                saved_team[username]["Team"].index(player)]
-        for player in saved_team[username]["Team"]:
-            self.add_player(player, mode="normal")
+                self.fpl.fplapi.main_df["id_x"] == element], ["cost"]] = saved_team[username]["Starters_prices"][
+                saved_team[username]["Team_elements"].index(element)]
+        for element in saved_team[username]["Team_elements"]:
+            self.add_player(mode="normal", element=element)
 
     def saved_budget_changes(self, saved_team: dict, username: str) -> None:
         """
@@ -790,16 +806,11 @@ class FPLteam:
         :return: None
         """
         team_list_elements = self.fpl.fplapi.get_team(username, password)["team_elements"]
-        team_list = (
-            [self.fpl.player_data["name"][element == self.fpl.player_data["id_x"]]
-             [self.fpl.player_data.index[element == self.fpl.player_data["id_x"]].tolist()[0]]
-             for element in team_list_elements]
-        )
-        team_starters = []
+        team_starters_ids = []
         for number in range(11):
-            team_starters.append(team_list[number])
-        for player in team_starters:
-            self.add_player(player, mode="normal")
+            team_starters_ids.append(team_list_elements[number])
+        for element in team_starters_ids:
+            self.add_player(mode="normal", element=element)
 
     def user_budget_changes(self, username, password) -> None:
         """
@@ -826,37 +837,37 @@ class FPLteam:
                 all_teams.append(team)
         return all_teams
 
-    def retry_players(self, all_teams: list, used_players: list) -> None:
+    def retry_players(self, all_teams: list, used_players_elements: list) -> None:
         """
         Makes the player available for the team again if his premier league team doesn't appear more than 2 times in
         the players' teams count according to the FPL rules
 
         :param all_teams: A list of all the premier league teams
         :type all_teams: list
-        :param used_players: A list of the players already used in the loops
-        :type used_players: list
+        :param used_players_elements: A list of the player IDs already used in the loops
+        :type used_players_elements: list
         :return: None
         """
         for team in all_teams:
             if self.player_teams.count(team) < 3:
                 for n in range(11):
-                    for player in used_players:
-                        if self.fpl.player_stat(player, "team") == team:
-                            used_players.remove(player)
+                    for element in used_players_elements:
+                        if self.fpl.player_stat(element, "team") == team:
+                            used_players_elements.remove(element)
 
     def change_players_first_loop(
-            self, used_players: list, changing_players: list, team_player: str, max_budget: list,
+            self, used_players_elements: list, changing_players_elements: list, player_element: str, max_budget: list,
             temp_teams: list, temp_teams_change: list, mode: str
     ) -> None:
         """
         First loop through players in the change_players method (Just replacing the original changing players)
 
-        :param used_players: A list of the players already used in the loops
-        :type used_players: list
-        :param changing_players: A list of the players in the process of changing
-        :type changing_players: list
-        :param team_player: A player from the changing_players list
-        :type team_player: str
+        :param used_players_elements: A list of the player IDs already used in the loops
+        :type used_players_elements: list
+        :param changing_players_elements: A list of the player IDs in the process of changing
+        :type changing_players_elements: list
+        :param player_element: A player ID from the changing_players_elements list
+        :type player_element: str
         :param max_budget: A list containing the maximum budget for the player change
         :type max_budget: list
         :param temp_teams: A list of the team's players' premier league teams
@@ -872,67 +883,70 @@ class FPLteam:
             calculation_mode = "point_calculation"
         elif mode == "free_hit":
             calculation_mode = "captain_points"
-        for name in self.fpl.player_data["name"]:
+        for element in self.fpl.player_data["id_x"]:
             if (
-                self.player_checks(name, team_player, used_players)
+                self.player_checks(element, player_element, used_players_elements)
                 # Check if the player is already in the players that are about to change
-                and name not in changing_players
+                and element not in changing_players_elements
                 # Check for valid points
-                and self.fpl.player_stat(name, calculation_mode) > 0
+                and self.fpl.player_stat(element, calculation_mode) > 0
             ):
                 temporary_budget = round(
                     (
-                     self.fpl.player_stat(name, "cost")
-                     + sum([self.fpl.player_stat(player, "cost") for player in changing_players
-                            if player != team_player])
+                     self.fpl.player_stat(element, "cost")
+                     + sum([self.fpl.player_stat(element, "cost") for element in changing_players_elements
+                            if element != player_element])
                     ), 1
                 )
                 if temporary_budget <= max_budget[0]:
                     # Checking the budget limit
-                    player_team_number = (temp_teams.count(self.fpl.player_stat(name, "team")))
-                    if self.fpl.player_stat(name, "team") == temp_teams_change[changing_players.index(team_player)]:
+                    player_team_number = (temp_teams.count(self.fpl.player_stat(element, "team")))
+                    if (
+                        self.fpl.player_stat(element, "team")
+                        == temp_teams_change[changing_players_elements.index(player_element)]
+                    ):
                         # Check team limit
                         if player_team_number < 4:
-                            update_list(changing_players, name, team_player)
+                            update_list(changing_players_elements, element, player_element)
 
                             update_list(
-                                temp_teams_change, self.fpl.player_stat(name, "team"),
-                                self.fpl.player_stat(team_player, "team")
+                                temp_teams_change, self.fpl.player_stat(element, "team"),
+                                self.fpl.player_stat(player_element, "team")
                             )
 
                             update_list(
-                                temp_teams, self.fpl.player_stat(name, "team"),
-                                self.fpl.player_stat(team_player, "team")
+                                temp_teams, self.fpl.player_stat(element, "team"),
+                                self.fpl.player_stat(player_element, "team")
                             )
                             break
                     else:
                         if player_team_number < 3:
-                            update_list(changing_players, name, team_player)
+                            update_list(changing_players_elements, element, player_element)
 
                             update_list(
-                                temp_teams_change, self.fpl.player_stat(name, "team"),
-                                self.fpl.player_stat(team_player, "team")
+                                temp_teams_change, self.fpl.player_stat(element, "team"),
+                                self.fpl.player_stat(player_element, "team")
                             )
 
                             update_list(
-                                temp_teams, self.fpl.player_stat(name, "team"),
-                                self.fpl.player_stat(team_player, "team")
+                                temp_teams, self.fpl.player_stat(element, "team"),
+                                self.fpl.player_stat(player_element, "team")
                             )
                             break
 
     def change_players_more_loops(
-            self, used_players: list, changing_players: list, team_player: str, max_budget: list,
+            self, used_players_elements: list, changing_players_elements: list, player_element: str, max_budget: list,
             temp_teams: list, temp_teams_change: list, mode: str
     ) -> None:
         """
         Loops after the first loop through players in the change_players method
 
-        :param used_players: A list of the players already used in the loops
-        :type used_players: list
-        :param changing_players: A list of the players in the process of changing
-        :type changing_players: list
-        :param team_player: A player from the changing_players list
-        :type team_player: str
+        :param used_players_elements: A list of the player IDs already used in the loops
+        :type used_players_elements: list
+        :param changing_players_elements: A list of the player IDs in the process of changing
+        :type changing_players_elements: list
+        :param player_element: A player ID from the changing_players_elements list
+        :type player_element: str
         :param max_budget: A list containing the maximum budget for the player change
         :type max_budget: list
         :param temp_teams: A list of the team's players' premier league teams
@@ -948,140 +962,154 @@ class FPLteam:
             calculation_mode = "point_calculation"
         elif mode == "free_hit":
             calculation_mode = "captain_points"
-        for name in self.fpl.player_data["name"]:
+        for element in self.fpl.player_data["id_x"]:
             if (
-                self.player_checks(name, team_player, used_players)
+                self.player_checks(element, player_element, used_players_elements)
                 # Check if the player is already in the players that are about to change
-                and name not in changing_players
+                and element not in changing_players_elements
                 # Check for valid points
-                and self.fpl.player_stat(name, calculation_mode) > 0
+                and self.fpl.player_stat(element, calculation_mode) > 0
                 # Check for better points
-                and sum([self.fpl.player_stat(player, calculation_mode)
-                         for player in changing_players])
-                < self.fpl.player_stat(name, calculation_mode)
-                + sum([self.fpl.player_stat(player, calculation_mode)
-                       for player in changing_players if player != team_player])
+                and sum([self.fpl.player_stat(pl_element, calculation_mode)
+                         for pl_element in changing_players_elements])
+                < self.fpl.player_stat(element, calculation_mode)
+                + sum([self.fpl.player_stat(pl_element, calculation_mode)
+                       for pl_element in changing_players_elements if pl_element != player_element])
             ):
                 temporary_budget = round(
                     (
-                     self.fpl.player_stat(name, "cost")
-                     + sum([self.fpl.player_stat(player, "cost") for player in changing_players
-                            if player != team_player])
+                     self.fpl.player_stat(element, "cost")
+                     + sum([self.fpl.player_stat(pl_element, "cost") for pl_element in changing_players_elements
+                            if pl_element != player_element])
                     ), 1
                 )
                 if temporary_budget <= max_budget[0]:
                     # Checking the budget limit
-                    player_team_number = (temp_teams.count(self.fpl.player_stat(name, "team")))
-                    if self.fpl.player_stat(name, "team") == (temp_teams_change[changing_players.index(team_player)]):
+                    player_team_number = (temp_teams.count(self.fpl.player_stat(element, "team")))
+                    if (
+                        self.fpl.player_stat(element, "team")
+                        == (temp_teams_change[changing_players_elements.index(player_element)])
+                    ):
                         # Check team limit
                         if player_team_number < 4:
-                            update_list(changing_players, name, team_player)
+                            update_list(changing_players_elements, element, player_element)
 
                             update_list(
-                                temp_teams_change, self.fpl.player_stat(name, "team"),
-                                self.fpl.player_stat(team_player, "team")
+                                temp_teams_change, self.fpl.player_stat(element, "team"),
+                                self.fpl.player_stat(player_element, "team")
                             )
 
                             update_list(
-                                temp_teams, self.fpl.player_stat(name, "team"),
-                                self.fpl.player_stat(team_player, "team")
+                                temp_teams, self.fpl.player_stat(element, "team"),
+                                self.fpl.player_stat(player_element, "team")
                             )
                             break
                     else:
-                        if self.fpl.player_stat(name, "team") in temp_teams_change:
+                        if self.fpl.player_stat(element, "team") in temp_teams_change:
                             # Check for players on the team limit in order to pick the best ones in the
                             # next loop
-                            for player in changing_players:
+                            for pl_element in changing_players_elements:
                                 if (
                                     # Checking for players other than the player that's currently
                                     # updating
-                                    player != team_player
+                                    pl_element != player_element
                                     # Check for better points
-                                    and self.fpl.player_stat(player, calculation_mode)
-                                    > self.fpl.player_stat(name, calculation_mode) > 0
+                                    and self.fpl.player_stat(pl_element, calculation_mode)
+                                    > self.fpl.player_stat(element, calculation_mode) > 0
                                     # Check team limit
                                     and player_team_number > 2
                                     # Check team
-                                    and self.fpl.player_stat(player, "team") == self.fpl.player_stat(name, "team")
+                                    and (
+                                         self.fpl.player_stat(pl_element, "team")
+                                         == self.fpl.player_stat(element, "team")
+                                    )
                                     # Don't enter the name twice in the list
-                                    and name not in used_players
+                                    and element not in used_players_elements
                                 ):
-                                    used_players.append(name)
+                                    used_players_elements.append(element)
                                 elif (
                                       # Checking for players other than the player that's currently
                                       # updating
-                                      player != team_player
+                                      pl_element != player_element
                                       # Check for better points
-                                      and 0 < self.fpl.player_stat(player, calculation_mode)
-                                      < self.fpl.player_stat(name, calculation_mode)
+                                      and 0 < self.fpl.player_stat(pl_element, calculation_mode)
+                                      < self.fpl.player_stat(element, calculation_mode)
                                       # Check team limit
                                       and player_team_number > 2
                                       # Check team
-                                      and self.fpl.player_stat(player, "team") == self.fpl.player_stat(name, "team")
+                                      and (
+                                           self.fpl.player_stat(pl_element, "team")
+                                           == self.fpl.player_stat(element, "team")
+                                      )
                                       # Don't enter the name twice in the list
-                                      and player not in used_players
+                                      and pl_element not in used_players_elements
                                 ):
-                                    used_players.append(player)
+                                    used_players_elements.append(pl_element)
                         if player_team_number < 3:
-                            update_list(changing_players, name, team_player)
+                            update_list(changing_players_elements, element, player_element)
 
                             update_list(
-                                temp_teams_change, self.fpl.player_stat(name, "team"),
-                                self.fpl.player_stat(team_player, "team")
+                                temp_teams_change, self.fpl.player_stat(element, "team"),
+                                self.fpl.player_stat(player_element, "team")
                             )
 
                             update_list(
-                                temp_teams, self.fpl.player_stat(name, "team"),
-                                self.fpl.player_stat(team_player, "team")
+                                temp_teams, self.fpl.player_stat(element, "team"),
+                                self.fpl.player_stat(player_element, "team")
                             )
                             break
 
-    def update_team_first_loop(self, used_players: list, team_player: str, max_budget: float, mode: str) -> None:
+    def update_team_first_loop(self, used_players_elements: list, player_element: str,
+                               max_budget: float, mode: str) -> None:
         """
         First loop through players in the update_team method (Just replacing the original players)
 
-        :param used_players: A list of the players already used in the loops
-        :type used_players: list
-        :param team_player: A player from the team list
-        :type team_player: str
+        :param used_players_elements: A list of the player IDs already used in the loops
+        :type used_players_elements: list
+        :param player_element: A player ID from the team list
+        :type player_element: str
         :param max_budget: A float of the maximum budget for the team
         :type max_budget: float
         :param mode: Option between 'normal' and 'free_hit' that determines the type of update
         :type mode: str
         :return: None
         """
-        for name in self.fpl.player_data["name"]:
-            if self.player_checks(name, team_player, used_players):
+        for element in self.fpl.player_data["id_x"]:
+            if self.player_checks(element, player_element, used_players_elements):
                 temporary_budget = round(
                     (
                      self.starters_budget
-                     + self.fpl.player_stat(name, "cost")
-                     - self.fpl.player_stat(team_player, "cost")
+                     + self.fpl.player_stat(element, "cost")
+                     - self.fpl.player_stat(player_element, "cost")
                     ), 1
                 )
                 if temporary_budget <= max_budget:
                     # Checking the budget limit
-                    player_team_number = (self.player_teams.count(self.fpl.player_stat(name, "team")))
-                    if self.fpl.player_stat(name, "team") == self.player_teams[self.team.index(team_player)]:
+                    player_team_number = (self.player_teams.count(self.fpl.player_stat(element, "team")))
+                    if (
+                        self.fpl.player_stat(element, "team")
+                        == self.player_teams[self.team_elements.index(player_element)]
+                    ):
                         # Check team limit
                         if player_team_number < 4:
-                            self.add_player(name, mode)
-                            self.remove_player(team_player, mode)
+                            self.add_player(mode=mode, element=element)
+                            self.remove_player(mode=mode, element=player_element)
                             break
                     else:
                         if player_team_number < 3:
-                            self.add_player(name, mode)
-                            self.remove_player(team_player, mode)
+                            self.add_player(mode=mode, element=element)
+                            self.remove_player(mode=mode, element=player_element)
                             break
 
-    def update_team_more_loops(self, used_players: list, team_player: str, max_budget: float, mode: str) -> None:
+    def update_team_more_loops(self, used_players_elements: list, player_element: str,
+                               max_budget: float, mode: str) -> None:
         """
         Loops after the first loop through players in the update_team method
 
-        :param used_players: A list of the players already used in the loops
-        :type used_players: list
-        :param team_player: A player from the team list
-        :type team_player: str
+        :param used_players_elements: A list of the player IDs already used in the loops
+        :type used_players_elements: list
+        :param player_element: A player ID from the team list
+        :type player_element: str
         :param max_budget: A float of the maximum budget for the team
         :type max_budget: float
         :param mode: Option between 'normal' and 'free_hit' that determines the type of update
@@ -1093,71 +1121,74 @@ class FPLteam:
             calculation_mode = "point_calculation"
         elif mode == "free_hit":
             calculation_mode = "captain_points"
-        for name in self.fpl.player_data["name"]:
+        for element in self.fpl.player_data["id_x"]:
             if (
-                self.player_checks(name, team_player, used_players)
+                self.player_checks(element, player_element, used_players_elements)
                 # Check for better points
-                and self.fpl.player_stat(name, calculation_mode)
-                > self.fpl.player_stat(team_player, calculation_mode)
+                and self.fpl.player_stat(element, calculation_mode)
+                > self.fpl.player_stat(player_element, calculation_mode)
             ):
                 temporary_budget = round(
                     (
                      self.starters_budget
-                     + self.fpl.player_stat(name, "cost")
-                     - self.fpl.player_stat(team_player, "cost")
+                     + self.fpl.player_stat(element, "cost")
+                     - self.fpl.player_stat(player_element, "cost")
                     ), 1
                 )
                 if temporary_budget <= max_budget:
                     # Checking the budget limit
-                    player_team_number = (self.player_teams.count(self.fpl.player_stat(name, "team")))
+                    player_team_number = (self.player_teams.count(self.fpl.player_stat(element, "team")))
                     if (
-                        self.fpl.player_stat(name, "team")
-                        == self.player_teams[self.team.index(team_player)]
+                        self.fpl.player_stat(element, "team")
+                        == self.player_teams[self.team_elements.index(player_element)]
                     ):
                         # Check team limit
                         if player_team_number < 4:
-                            self.add_player(name, mode)
-                            self.remove_player(team_player, mode)
+                            self.add_player(mode=mode, element=element)
+                            self.remove_player(mode=mode, element=player_element)
                             break
                     else:
-                        if self.fpl.player_stat(name, "team") in self.player_teams:
+                        if self.fpl.player_stat(element, "team") in self.player_teams:
                             # Check for players on the team limit in order to pick the best ones in the
                             # next loop
-                            for player in self.team:
+                            for pl_element in self.team_elements:
                                 if (
                                     # Checking for players other than the player that's currently
                                     # updating
-                                    player != team_player
+                                    pl_element != player_element
                                     # Check for better points
-                                    and self.fpl.player_stat(player, calculation_mode)
-                                    > self.fpl.player_stat(name, calculation_mode) > 0
+                                    and self.fpl.player_stat(pl_element, calculation_mode)
+                                    > self.fpl.player_stat(element, calculation_mode) > 0
                                     # Check team limit
                                     and player_team_number > 2
                                     # Check team
-                                    and self.fpl.player_stat(player, "team")
-                                    == self.fpl.player_stat(name, "team")
+                                    and self.fpl.player_stat(pl_element, "team")
+                                    == self.fpl.player_stat(element, "team")
                                     # Don't enter the name twice in the list
-                                    and name not in used_players
+                                    and element not in used_players_elements
                                 ):
-                                    used_players.append(name)
+                                    used_players_elements.append(element)
                                 elif (
                                       # Checking for players other than the player that's currently
                                       # updating
-                                      player != team_player
+                                      pl_element != player_element
                                       # Check for better points
-                                      and 0 < self.fpl.player_stat(player, calculation_mode)
-                                      < self.fpl.player_stat(name, calculation_mode)
+                                      and 0 < self.fpl.player_stat(pl_element, calculation_mode)
+                                      < self.fpl.player_stat(element, calculation_mode)
                                       # Check team limit
                                       and player_team_number > 2
                                       # Check team
-                                      and self.fpl.player_stat(player, "team") == self.fpl.player_stat(name, "team")
+                                      and (
+                                           self.fpl.player_stat(pl_element, "team")
+                                           == self.fpl.player_stat(element, "team")
+                                      )
                                       # Don't enter the name twice in the list
-                                      and player not in used_players
+                                      and pl_element not in used_players_elements
                                 ):
-                                    used_players.append(player)
+                                    used_players_elements.append(pl_element)
                         if player_team_number < 3:
-                            self.add_player(name, mode)
-                            self.remove_player(team_player, mode)
+                            self.add_player(mode=mode, element=element)
+                            self.remove_player(mode=mode, element=player_element)
                             break
 
     def transfer_single_loop(self) -> None:
@@ -1167,47 +1198,50 @@ class FPLteam:
         :return: None
         """
         max_budget_single_transfer = round(self.total_budget - self.changes_budget, 1)
-        used_players = []
-        for player in self.team:
+        used_players_elements = []
+        for pl_element in self.team_elements:
             possible_transfers = {}
-            for name in self.fpl.player_data["name"]:
+            for element in self.fpl.player_data["id_x"]:
                 if (
-                    self.player_checks(name, player, used_players)
+                    self.player_checks(element, pl_element, used_players_elements)
                     # Check for better transfer points
-                    and self.fpl.player_stat(name, "transfer_points") >= self.player_points[self.team.index(player)]
+                    and (
+                         self.fpl.player_stat(element, "transfer_points")
+                         >= self.player_points[self.team_elements.index(pl_element)]
+                    )
                 ):
                     temporary_budget = round(
                         (
                          self.starters_budget
-                         + self.fpl.player_stat(name, "cost")
-                         - self.fpl.player_stat(player, "cost")
+                         + self.fpl.player_stat(element, "cost")
+                         - self.fpl.player_stat(pl_element, "cost")
                         ), 1
                     )
                     if temporary_budget <= max_budget_single_transfer:
                         # Checking the budget limit
                         player_team_number = (
-                            self.player_teams.count(self.fpl.player_stat(name, "team"))
+                            self.player_teams.count(self.fpl.player_stat(element, "team"))
                         )
                         if (
-                            self.fpl.player_stat(name, "team")
-                            == self.player_teams[self.team.index(player)]
+                            self.fpl.player_stat(element, "team")
+                            == self.player_teams[self.team_elements.index(pl_element)]
                         ):
                             # Check team limit
                             if player_team_number < 4:
                                 transfer_per_dif = round(
-                                    (self.fpl.player_stat(name, "transfer_points")
-                                     / (self.fpl.player_stat(name, "transfer_points")
-                                        + self.fpl.player_stat(player, "point_calculation"))) * 100, 2
+                                    (self.fpl.player_stat(element, "transfer_points")
+                                     / (self.fpl.player_stat(element, "transfer_points")
+                                        + self.fpl.player_stat(pl_element, "point_calculation"))) * 100, 2
                                 )
-                                possible_transfers.update({name: transfer_per_dif})
+                                possible_transfers.update({self.fpl.player_stat(element, "name"): transfer_per_dif})
                         else:
                             if player_team_number < 3:
                                 transfer_per_dif = round(
-                                    (self.fpl.player_stat(name, "transfer_points")
-                                     / (self.fpl.player_stat(name, "transfer_points")
-                                        + self.fpl.player_stat(player, "point_calculation"))) * 100, 2
+                                    (self.fpl.player_stat(element, "transfer_points")
+                                     / (self.fpl.player_stat(element, "transfer_points")
+                                        + self.fpl.player_stat(pl_element, "point_calculation"))) * 100, 2
                                 )
-                                possible_transfers.update({name: transfer_per_dif})
+                                possible_transfers.update({self.fpl.player_stat(element, "name"): transfer_per_dif})
             percentage_list = list(possible_transfers.values())
             percentage_list.sort(reverse=True)
             sorted_possible_transfers = {}
@@ -1215,7 +1249,7 @@ class FPLteam:
                 for name, percentage in possible_transfers.items():
                     if number == percentage:
                         sorted_possible_transfers.update({name: percentage})
-            print(f"\nPossible transfers for {player}: ")
+            print(f"\nPossible transfers for {self.fpl.player_stat(pl_element, 'name')}: ")
             if len(possible_transfers) == 0:
                 print("-")
             else:
@@ -1223,20 +1257,21 @@ class FPLteam:
                 for name in sorted_possible_transfers:
                     print(f"{name:<24}{sorted_possible_transfers[name]} %")
 
-    def transfer_double_first_loop(self, used_players: list, possible_transfers: dict, key: int, team_player: str,
+    def transfer_double_first_loop(self, used_players_elements: list, possible_transfers_elements: dict, key: int,
+                                   player_element: str,
                                    max_budget: list, teams: list, teams_transfer: list, mode: str) -> None:
         """
         Double transfer suggestion first loop through players
         (Just replacing the original players of the possible transfer)
 
-        :param used_players: A list of the players already used in the loops
-        :type used_players: list
-        :param possible_transfers: A dictionary of the possible double transfer combinations
-        :type possible_transfers: dict
+        :param used_players_elements: A list of the player IDs already used in the loops
+        :type used_players_elements: list
+        :param possible_transfers_elements: A dictionary of the possible double transfer combinations
+        :type possible_transfers_elements: dict
         :param key: The key of the possible_transfers dictionary
         :type key: int
-        :param team_player: A player from the team list
-        :type team_player: str
+        :param player_element: A player ID from the team list
+        :type player_element: str
         :param max_budget: A list of the possible max budgets
         :type max_budget: list
         :param teams: A list of the premier league teams of the players in the team, which updates while transfer
@@ -1253,67 +1288,68 @@ class FPLteam:
             calculation_mode_transfer = "transfer_points"
         elif mode == "free_hit":
             calculation_mode_transfer = "captain_points"
-        for name in self.fpl.player_data["name"]:
+        for element in self.fpl.player_data["id_x"]:
             if (
-                self.player_checks(name, team_player, used_players)
+                self.player_checks(element, player_element, used_players_elements)
                 # Check if the name is already in the changing duo
-                and name not in possible_transfers[key]
+                and element not in possible_transfers_elements[key]
                 # Check for valid transfer points
-                and self.fpl.player_stat(name, calculation_mode_transfer) > 0
+                and self.fpl.player_stat(element, calculation_mode_transfer) > 0
             ):
                 temporary_budget = round(
                     (
-                     self.fpl.player_stat(name, "cost")
-                     + sum([self.fpl.player_stat(player, "cost")
-                            for player in possible_transfers[key]
-                            if player != team_player])
+                     self.fpl.player_stat(element, "cost")
+                     + sum([self.fpl.player_stat(pl_element, "cost")
+                            for pl_element in possible_transfers_elements[key]
+                            if pl_element != player_element])
                     ), 1
                 )
                 if temporary_budget <= max_budget[key]:
                     # Checking the budget limit
-                    player_team_number = (teams.count(self.fpl.player_stat(name, "team")))
+                    player_team_number = (teams.count(self.fpl.player_stat(element, "team")))
                     if (
-                        self.fpl.player_stat(name, "team")
-                        == teams_transfer[0][possible_transfers[key].index(team_player)]
+                        self.fpl.player_stat(element, "team")
+                        == teams_transfer[0][possible_transfers_elements[key].index(player_element)]
                     ):
                         # Check team limit
                         if player_team_number < 4:
-                            possible_transfers[key] = list(map(lambda x: x.replace(team_player, name),
-                                                               possible_transfers[key]))
+                            possible_transfers_elements[key] = list(map(lambda x: element if x == player_element else x,
+                                                                        possible_transfers_elements[key]))
 
-                            teams_transfer[0].insert(0, self.fpl.player_stat(name, "team"))
+                            teams_transfer[0].insert(0, self.fpl.player_stat(element, "team"))
                             teams_transfer[0].remove(self.fpl.player_stat(
-                                team_player, "team"))
+                                player_element, "team"))
 
-                            teams.append(self.fpl.player_stat(name, "team"))
-                            teams.remove(self.fpl.player_stat(team_player, "team"))
+                            teams.append(self.fpl.player_stat(element, "team"))
+                            teams.remove(self.fpl.player_stat(player_element, "team"))
                             break
                     else:
                         if player_team_number < 3:
-                            possible_transfers[key] = list(map(lambda x: x.replace(team_player, name),
-                                                               possible_transfers[key]))
+                            possible_transfers_elements[key] = list(map(lambda x: element if x == player_element else x,
+                                                                        possible_transfers_elements[key]))
 
-                            teams_transfer[0].insert(0, self.fpl.player_stat(name, "team"))
+                            teams_transfer[0].insert(0, self.fpl.player_stat(element, "team"))
                             teams_transfer[0].remove(self.fpl.player_stat(
-                                team_player, "team"))
+                                player_element, "team"))
 
-                            teams.append(self.fpl.player_stat(name, "team"))
-                            teams.remove(self.fpl.player_stat(team_player, "team"))
+                            teams.append(self.fpl.player_stat(element, "team"))
+                            teams.remove(self.fpl.player_stat(player_element, "team"))
                             break
 
-    def transfer_double_more_loops(self, used_players: list, possible_transfers: dict, key: int, team_player: str,
+    def transfer_double_more_loops(self, used_players_elements: list, possible_transfers_elements: dict, key: int,
+                                   player_element: str,
                                    max_budget: list, teams: list, teams_transfer: list, mode: str) -> None:
         """
         Double transfer suggestion loops after the first loop through players
 
-        :param used_players: A list of the players already used in the loops
-        :type used_players: list
-        :param possible_transfers: A dictionary of the possible double transfer combinations
-        :type possible_transfers: dict
+        :param used_players_elements: A list of the player IDs already used in the loops
+        :type used_players_elements: list
+        :param possible_transfers_elements: A dictionary of the possible double transfer combinations
+        :type possible_transfers_elements: dict
         :param key: The key of the possible_transfers dictionary
         :type key: int
-        :param team_player: A player from the team list
-        :type team_player: str
+        :param player_element: A player ID from the team list
+        :type player_element: str
         :param max_budget: A list of the possible max budgets
         :type max_budget: list
         :param teams: A list of the premier league teams of the players in the team, which updates while transfer
@@ -1330,90 +1366,90 @@ class FPLteam:
             calculation_mode_transfer = "transfer_points"
         elif mode == "free_hit":
             calculation_mode_transfer = "captain_points"
-        for name in self.fpl.player_data["name"]:
+        for element in self.fpl.player_data["id_x"]:
             if (
-                self.player_checks(name, team_player, used_players)
+                self.player_checks(element, player_element, used_players_elements)
                 # Check if the name is already in the changing duo
-                and name not in possible_transfers[key]
+                and element not in possible_transfers_elements[key]
                 # Check for valid transfer points
-                and self.fpl.player_stat(name, calculation_mode_transfer) > 0
+                and self.fpl.player_stat(element, calculation_mode_transfer) > 0
                 # Check for better transfer points
-                and sum([self.fpl.player_stat(player, calculation_mode_transfer)
-                         for player in possible_transfers[key]])
-                < self.fpl.player_stat(name, calculation_mode_transfer)
-                + [self.fpl.player_stat(player, calculation_mode_transfer)
-                   for player in possible_transfers[key] if player != team_player]
+                and sum([self.fpl.player_stat(pl_element, calculation_mode_transfer)
+                         for pl_element in possible_transfers_elements[key]])
+                < self.fpl.player_stat(element, calculation_mode_transfer)
+                + [self.fpl.player_stat(pl_element, calculation_mode_transfer)
+                   for pl_element in possible_transfers_elements[key] if pl_element != player_element]
             ):
                 temporary_budget = round(
                     (
-                     self.fpl.player_stat(name, "cost")
+                     self.fpl.player_stat(element, "cost")
                      + sum([self.fpl.player_stat(player, "cost")
-                            for player in possible_transfers[key]
-                            if player != team_player])
+                            for player in possible_transfers_elements[key]
+                            if player != player_element])
                     ), 1
                 )
                 if temporary_budget <= max_budget[key]:
                     # Checking the budget limit
-                    player_team_number = (teams.count(self.fpl.player_stat(name, "team")))
+                    player_team_number = (teams.count(self.fpl.player_stat(element, "team")))
                     if (
-                        self.fpl.player_stat(name, "team")
-                        == (teams_transfer[0][possible_transfers[key].index(team_player)])
+                        self.fpl.player_stat(element, "team")
+                        == (teams_transfer[0][possible_transfers_elements[key].index(player_element)])
                     ):
                         # Check team limit
                         if player_team_number < 4:
-                            possible_transfers[key] = list(map(lambda x: x.replace(team_player, name),
-                                                               possible_transfers[key]))
+                            possible_transfers_elements[key] = list(map(lambda x: element if x == player_element else x,
+                                                                        possible_transfers_elements[key]))
 
-                            teams_transfer[0].insert(0, self.fpl.player_stat(name, "team"))
+                            teams_transfer[0].insert(0, self.fpl.player_stat(element, "team"))
                             teams_transfer[0].remove(self.fpl.player_stat(
-                                team_player, "team"))
+                                player_element, "team"))
 
-                            teams.append(self.fpl.player_stat(name, "team"))
+                            teams.append(self.fpl.player_stat(element, "team"))
                             teams.remove(self.fpl.player_stat(
-                                team_player, "team"))
+                                player_element, "team"))
                             break
                     else:
-                        if self.fpl.player_stat(name, "team") in teams_transfer[0]:
+                        if self.fpl.player_stat(element, "team") in teams_transfer[0]:
                             # Check for players on the team limit in order to pick the
                             # best ones in the next loop
-                            for player in possible_transfers[key]:
+                            for pl_element in possible_transfers_elements[key]:
                                 if (
                                     # Checking for players other than the player
                                     # that's currently updating
-                                    player != team_player
+                                    pl_element != player_element
                                     # Check for better transfer points
-                                    and self.fpl.player_stat(player, calculation_mode_transfer)
-                                    > self.fpl.player_stat(name, calculation_mode_transfer) > 0
+                                    and self.fpl.player_stat(pl_element, calculation_mode_transfer)
+                                    > self.fpl.player_stat(element, calculation_mode_transfer) > 0
                                     # Check team limit
                                     and player_team_number > 2
                                     # Don't enter the name twice in the list
-                                    and name not in used_players
+                                    and element not in used_players_elements
                                 ):
-                                    used_players.append(name)
+                                    used_players_elements.append(element)
                                 elif (
                                       # Checking for players other than the player
                                       # that's currently updating
-                                      player != team_player
+                                      pl_element != player_element
                                       # Check for better transfer points
-                                      and 0 < self.fpl.player_stat(player, calculation_mode_transfer)
-                                      < self.fpl.player_stat(name, calculation_mode_transfer)
+                                      and 0 < self.fpl.player_stat(pl_element, calculation_mode_transfer)
+                                      < self.fpl.player_stat(element, calculation_mode_transfer)
                                       # Check team limit
                                       and player_team_number > 2
                                       # Don't enter the name twice in the list
-                                      and player not in used_players
+                                      and pl_element not in used_players_elements
                                 ):
-                                    used_players.append(player)
+                                    used_players_elements.append(pl_element)
                         if player_team_number < 3:
-                            possible_transfers[key] = list(map(lambda x: x.replace(team_player, name),
-                                                               possible_transfers[key]))
+                            possible_transfers_elements[key] = list(map(lambda x: element if x == player_element else x,
+                                                                        possible_transfers_elements[key]))
 
-                            teams_transfer[0].insert(0, self.fpl.player_stat(name, "team"))
+                            teams_transfer[0].insert(0, self.fpl.player_stat(element, "team"))
                             teams_transfer[0].remove(self.fpl.player_stat(
-                                team_player, "team"))
+                                player_element, "team"))
 
-                            teams.append(self.fpl.player_stat(name, "team"))
+                            teams.append(self.fpl.player_stat(element, "team"))
                             teams.remove(self.fpl.player_stat(
-                                team_player, "team"))
+                                player_element, "team"))
                             break
 
     def transfer_double_loop(self, mode: str) -> None:
@@ -1440,40 +1476,43 @@ class FPLteam:
         starting_transfer_points_list = []
         for key in possible_transfers.keys():
             player_budget = self.bank_budget
-            for player in possible_transfers[key]:
-                player_budget += self.fpl.player_stat(player, "cost")
+            for pl_element in possible_transfers[key]:
+                player_budget += self.fpl.player_stat(pl_element, "cost")
             max_budget.append(round(player_budget, 1))
-            changing_player_points = [self.fpl.player_stat(player, calculation_mode)
-                                      for player in possible_transfers[key]]
+            changing_player_points = [self.fpl.player_stat(pl_element, calculation_mode)
+                                      for pl_element in possible_transfers[key]]
             starting_transfer_points_list.append(changing_player_points)
         all_teams = self.pl_all_teams()
 
         for key in possible_transfers.keys():
             # Loop on all duo combinations
-            used_players = []
+            used_players_elements = []
             teams_transfer = []
             teams = [x for x in self.player_teams]
             teams_transfer.append([self.fpl.player_stat(possible_transfers[key][0], "team"),
                                    self.fpl.player_stat(possible_transfers[key][1], "team")])
-            print(f"\nPossible transfers for {possible_transfers[key]}:")
+            print(f"\nPossible transfers for ['{self.fpl.player_stat(possible_transfers[key][0], 'name')}', "
+                  f"'{self.fpl.player_stat(possible_transfers[key][1], 'name')}']:")
             for n in range(11):
                 # Loop again and retry used players
-                self.retry_players(all_teams, used_players)
+                self.retry_players(all_teams, used_players_elements)
                 for i in range(11):
                     # Loop again and retry all players
                     # (basically try the players that might have been suitable before the change
                     # by looping again)
-                    for team_player in possible_transfers[key]:
-                        if team_player in self.team or team_player in used_players:
+                    for player_element in possible_transfers[key]:
+                        if player_element in self.team_elements or player_element in used_players_elements:
                             # First check replacing players without checking points just to remove them
-                            self.transfer_double_first_loop(used_players, possible_transfers, key, team_player,
-                                                            max_budget, teams, teams_transfer, mode=mode)
+                            self.transfer_double_first_loop(used_players_elements, possible_transfers, key,
+                                                            player_element, max_budget, teams, teams_transfer,
+                                                            mode=mode)
                         else:
-                            self.transfer_double_more_loops(used_players, possible_transfers, key, team_player,
-                                                            max_budget, teams, teams_transfer, mode=mode)
+                            self.transfer_double_more_loops(used_players_elements, possible_transfers, key,
+                                                            player_element, max_budget, teams, teams_transfer,
+                                                            mode=mode)
 
-            final_transfer_points = [self.fpl.player_stat(player, calculation_mode_transfer)
-                                     for player in possible_transfers[key]]
+            final_transfer_points = [self.fpl.player_stat(pl_element, calculation_mode_transfer)
+                                     for pl_element in possible_transfers[key]]
             value_possibility = round(((final_transfer_points[0] / (final_transfer_points[0]
                                                                     + starting_transfer_points_list[key][0]))
                                        + (final_transfer_points[1] / (final_transfer_points[1]
@@ -1483,8 +1522,8 @@ class FPLteam:
                 print("-")
             else:
                 player_string = "["
-                for player in possible_transfers[key]:
-                    player_string += f"'{player}', "
+                for pl_element in possible_transfers[key]:
+                    player_string += f"'{self.fpl.player_stat(pl_element, 'name')}', "
                 player_string = player_string[:-2] + "]"
                 print("Players\t\t\t\t\tBetter Value Possibility")
                 print(f"{player_string:<40}{value_possibility} %")
@@ -1497,9 +1536,9 @@ class FPLteam:
         """
         possible_transfers = {}
         i = 0
-        for players in combinations(self.team, 2):
-            players = list(players)
-            possible_transfers.update({i: players})
+        for players_elements in combinations(self.team_elements, 2):
+            players_elements = list(players_elements)
+            possible_transfers.update({i: players_elements})
             i += 1
         return possible_transfers
 
@@ -1538,9 +1577,10 @@ class FPLteam:
                         "Changes_budget": round(self.changes_budget, 1),
                         "Bank_budget": round(self.bank_budget, 1),
                         "Team": self.team,
+                        "Team_elements": self.team_elements,
                         "Starters_prices": self.starters_prices,
                         "Changes_prices": self.changes_prices,
-                        "Last use": datetime.now().year
+                        "Last use": datetime.now().year,
                     }
                 }
                 saved_teams.update(team)
@@ -1576,6 +1616,7 @@ class FPLteam:
                                 "Changes_budget": round(self.changes_budget, 1),
                                 "Bank_budget": round(self.bank_budget, 1),
                                 "Team": self.team,
+                                "Team_elements": self.team_elements,
                                 "Starters_prices": self.starters_prices,
                                 "Changes_prices": self.changes_prices,
                                 "Last use": datetime.now().year
@@ -1601,27 +1642,27 @@ class FPLteam:
                 print("\nThis username doesn't exist.")
         return new_user
 
-    def player_checks(self, name: str, team_player: str, used_players: list) -> bool:
+    def player_checks(self, element: str, player_element: str, used_players_elements: list) -> bool:
         """
         Checks for player parameters in order to update the team or some player list
 
-        :param name: Name of the player in check
-        :type name: str
-        :param team_player: Name of the player being replaced in the process
-        :type team_player: str
-        :param used_players: A list of the players already used in the loops
-        :type used_players: list
+        :param element: ID of the player in check
+        :type element: str
+        :param player_element: ID of the player being replaced in the process
+        :type player_element: str
+        :param used_players_elements: A list of the player elements already used in the loops
+        :type used_players_elements: list
         :return: True or False
         """
         if (
             # Check if the player is used (exceeded the team limit while updating)
-            name not in used_players
+            element not in used_players_elements
             # Check the excluded players
-            and name not in self.unavailable_players_list
+            and element not in self.unavailable_players_list_elements
             # Check if the player is already in the team
-            and name not in self.team
+            and element not in self.team_elements
             # Check position
-            and self.fpl.player_stat(name, "position") == self.fpl.player_stat(team_player, "position")
+            and self.fpl.player_stat(element, "position") == self.fpl.player_stat(player_element, "position")
         ):
             return True
         else:
@@ -1636,15 +1677,15 @@ class FPLteam:
         self.managers = []
         self.manager_points = []
         self.managers_prices = []
-        for manager in self.fpl.player_data["name"]:
+        for manager_element in self.fpl.player_data["id_x"]:
             if (
-                self.fpl.player_stat(manager, "position") == "MNG"
-                and self.fpl.player_stat(manager, "cost") <= self.bank_budget
-                and self.player_teams.count(self.fpl.player_stat(manager, "team")) < 3
+                self.fpl.player_stat(manager_element, "position") == "MNG"
+                and self.fpl.player_stat(manager_element, "cost") <= self.bank_budget
+                and self.player_teams.count(self.fpl.player_stat(manager_element, "team")) < 3
             ):
-                self.managers.append(manager)
-                self.manager_points.append(self.fpl.player_stat(manager, "manager_points"))
-                self.managers_prices.append(self.fpl.player_stat(manager, "cost"))
+                self.managers.append(self.fpl.player_stat(manager_element, "name"))
+                self.manager_points.append(self.fpl.player_stat(manager_element, "manager_points"))
+                self.managers_prices.append(self.fpl.player_stat(manager_element, "cost"))
         if len(self.managers) == 0:
             self.managers.append("-")
             self.manager_points.append("-")
