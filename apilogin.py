@@ -77,7 +77,6 @@ class Login:
         response.raise_for_status()
         response_json = response.json()
         interaction_id = response_json["interactionId"]
-        interaction_token = response_json["interactionToken"]
 
         # Login
         print("Login: ", end="")
@@ -85,7 +84,6 @@ class Login:
             URL["login"],
             headers={
                 "interactionId": interaction_id,
-                "interactionToken": interaction_token,
             },
             json={
                 "id": response_json["id"],
@@ -100,7 +98,6 @@ class Login:
             URL["login"],
             headers={
                 "interactionId": interaction_id,
-                "interactionToken": interaction_token,
             },
             json={
                 "id": response.json()["id"],
