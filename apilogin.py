@@ -9,7 +9,7 @@ import uuid
 URL = {
         "auth": "https://account.premierleague.com/as/authorize",
         "start": "https://account.premierleague.com/davinci/policy/262ce4b01d19dd9d385d26bddb4297b6/start",
-        "login": "https://account.premierleague.com/davinci/connections/0d8c928e4970386733ce110b9dda8412/"
+        "login": "https://account.premierleague.com/davinci/connections/867ed4363b2bc21c860085ad2baa817d/"
                  "capabilities/customHTMLTemplate",
         "resume": "https://account.premierleague.com/as/resume",
         "token": "https://account.premierleague.com/as/token",

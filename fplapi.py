@@ -137,7 +137,7 @@ class FPLapi:
         self.fixtures_df = pd.DataFrame(data, columns=column_names)
         return self.fixtures_df
 
-    @cache
+    # @cache
     def get_team(self, username, password) -> dict:
         """
         Gets information from the player's team id
